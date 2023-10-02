@@ -1,9 +1,5 @@
 const Card = require("../models/card.js");
 
-module.exports.createCard = (req, res) => {
-  console.log(req.user._id); // _id станет доступен
-};
-
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
@@ -14,13 +10,13 @@ module.exports.getCards = (req, res) => {
         res.status(404).send({ message: "Ошибка в получении карточки" });
         return;
       }
-      res.status(500).send("Произошла ошибка на сервере");
+      return res.status(500).send("Произошла ошибка на сервере");
     });
 };
 
 module.exports.postCard = (req, res) => {
   const { name, link } = req.body;
-  const owner = req.user;
+  const owner = req.user._id;
 
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
@@ -29,7 +25,7 @@ module.exports.postCard = (req, res) => {
         res.status(400).send({ message: "Ошибка в создании карточки" });
         return;
       }
-      res.status(500).send("Произошла ошибка на сервере");
+      return res.status(500).send("Произошла ошибка на сервере");
     });
 };
 
@@ -41,7 +37,7 @@ module.exports.deleteCardId = (req, res) => {
         res.status(404).send({ message: "Ошибка в получении карточки" });
         return;
       }
-      res.status(500).send("Произошла ошибка на сервере");
+      return res.status(500).send("Произошла ошибка на сервере");
     });
 };
 
@@ -57,7 +53,7 @@ module.exports.deleteCardIdLikes = (req, res) => {
         res.status(404).send({ message: "Ошибка в получении карточки" });
         return;
       }
-      res.status(500).send("Произошла ошибка на сервере");
+      return res.status(500).send("Произошла ошибка на сервере");
     });
 };
 
@@ -73,6 +69,6 @@ module.exports.putCardIdLikes = (req, res) => {
         res.status(404).send({ message: "Ошибка в получении карточки" });
         return;
       }
-      res.status(500).send("Произошла ошибка на сервере");
+      return res.status(500).send("Произошла ошибка на сервере");
     });
 };
