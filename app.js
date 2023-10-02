@@ -22,7 +22,7 @@ app.use("/cards", routerCards);
 
 async function init() {
   await mongoose.connect("mongodb://127.0.0.1:27017/mestodb");
-  console.log("DB CONNECT");
+  console.log("DB CONNECTED");
 
   await app.listen(PORT);
   console.log(`Server listen on port ${PORT}`);

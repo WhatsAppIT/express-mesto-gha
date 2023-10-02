@@ -9,27 +9,40 @@ module.exports.getCards = (req, res) => {
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch(() => {
-      res.status(500).send({ message: "Ошибка в получении всех карточек" });
+    .catch((err) => {
+      if (err.name === "cardError") {
+        res.status(404).send({ message: "Ошибка в получении карточки" });
+        return;
+      }
+      res.status(500).send("Произошла ошибка на сервере");
     });
 };
 
 module.exports.postCard = (req, res) => {
   const { name, link } = req.body;
+  const owner = req.user;
 
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch((err) =>
-      res.status(500).send({ message: "Ошибка в создании карточки" })
-    );
+    .catch((err) => {
+      if (err.name === "postError") {
+        res.status(400).send({ message: "Ошибка в создании карточки" });
+        return;
+      }
+      res.status(500).send("Произошла ошибка на сервере");
+    });
 };
 
 module.exports.deleteCardId = (req, res) => {
   Card.findByIdAndRemove(req.params._id)
     .then((card) => res.send({ data: card }))
-    .catch((err) =>
-      res.status(500).send({ message: "Ошибка удаления карточки по _id" })
-    );
+    .catch((err) => {
+      if (err.name === "cardError") {
+        res.status(404).send({ message: "Ошибка в получении карточки" });
+        return;
+      }
+      res.status(500).send("Произошла ошибка на сервере");
+    });
 };
 
 module.exports.deleteCardIdLikes = (req, res) => {
@@ -39,7 +52,13 @@ module.exports.deleteCardIdLikes = (req, res) => {
     { new: true }
   )
     .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: "Ошибка удаления лайка" }));
+    .catch((err) => {
+      if (err.name === "cardError") {
+        res.status(404).send({ message: "Ошибка в получении карточки" });
+        return;
+      }
+      res.status(500).send("Произошла ошибка на сервере");
+    });
 };
 
 module.exports.putCardIdLikes = (req, res) => {
@@ -49,7 +68,11 @@ module.exports.putCardIdLikes = (req, res) => {
     { new: true }
   )
     .then((card) => res.send({ data: card }))
-    .catch((err) =>
-      res.status(500).send({ message: "Ошибка добавления лайка" })
-    );
+    .catch((err) => {
+      if (err.name === "cardError") {
+        res.status(404).send({ message: "Ошибка в получении карточки" });
+        return;
+      }
+      res.status(500).send("Произошла ошибка на сервере");
+    });
 };
