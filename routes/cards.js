@@ -3,14 +3,14 @@ const {
   getCards,
   postCard,
   deleteCardId,
-  putCardIdLikes,
-  deleteCardIdLikes,
+  putCardsIdLikes,
+  deleteCardsIdLikes,
 } = require("../controllers/cards.js");
 
 router.get("/", getCards);
 router.post("/", postCard);
 router.delete("/:cardId", deleteCardId);
-router.put("/:cardId/likes", putCardIdLikes);
-router.delete("/:cardId/likes", deleteCardIdLikes);
+router.put("/:cardId/likes", putCardsIdLikes);
+router.delete("/:cardId/likes", deleteCardsIdLikes);
 
 module.exports = router;
