@@ -1,6 +1,6 @@
 const User = require("../models/user.js");
 
-module.exports.getUsers = (req, res) => {
+const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
       res.send({ data: users });
@@ -12,7 +12,7 @@ module.exports.getUsers = (req, res) => {
     });
 };
 
-module.exports.getUserId = (req, res) => {
+const getUserId = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
@@ -31,7 +31,7 @@ module.exports.getUserId = (req, res) => {
     });
 };
 
-module.exports.postUser = (req, res) => {
+const postUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
@@ -41,7 +41,7 @@ module.exports.postUser = (req, res) => {
     );
 };
 
-module.exports.patchUsersMe = (req, res) => {
+const patchUsersMe = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(req.params.id, { name, about })
@@ -51,7 +51,7 @@ module.exports.patchUsersMe = (req, res) => {
     );
 };
 
-module.exports.patchUsersMeAvatar = (req, res) => {
+const patchUsersMeAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.params.id, { avatar })
@@ -59,4 +59,12 @@ module.exports.patchUsersMeAvatar = (req, res) => {
     .catch((err) =>
       res.status(500).send({ message: "Ошибка в обновлении аватара" })
     );
+};
+
+module.exports = {
+  getUsers,
+  getUserId,
+  postUser,
+  patchUsersMe,
+  patchUsersMeAvatar,
 };
