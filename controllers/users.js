@@ -13,13 +13,22 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserId = (req, res) => {
-  User.findById(req.params._id)
-    .then((user) => res.send({ data: user }))
-    .catch((err) =>
-      res
-        .status(500)
-        .send({ message: "Ошибка в получении пользователя по _id" })
-    );
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        const err = new Error("Ошибка в получении пользователя по _id");
+        err.name = "userNotFound";
+        throw err;
+      }
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === "userError") {
+        res
+          .status(500)
+          .send({ message: "Ошибка в получении пользователя по _id" });
+      }
+    });
 };
 
 module.exports.postUser = (req, res) => {
