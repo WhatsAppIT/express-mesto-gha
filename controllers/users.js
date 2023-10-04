@@ -25,17 +25,11 @@ const postUser = (req, res) => {
 
 const getUserId = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        return res
-          .status(404)
-          .send({ message: "Пользователь по указанному _id не найден." });
-      }
-    })
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.kind === "ObjectId") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные при создании пользователя.",
+      if (err.name === "CastError") {
+        return res.status(404).send({
+          message: "Пользователь по указанному _id не найден.",
         });
       }
       return res.status(500).send({ message: "Ошибка со стороны сервера." });
