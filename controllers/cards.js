@@ -2,11 +2,9 @@ const Card = require("../models/card.js");
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => {
-      res.send({ data: cards });
-    })
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
-      return res.status(500).send("Ошибка по умолчанию.");
+      return res.status(500).send("Ошибка со стороны сервера.");
     });
 };
 
@@ -22,7 +20,7 @@ const postCard = (req, res) => {
           message: "Переданы некорректные данные при создании карточки.",
         });
       }
-      return res.status(500).send("Ошибка по умолчанию.");
+      return res.status(500).send("Ошибка со стороны сервера.");
     });
 };
 
@@ -35,7 +33,7 @@ const deleteCardId = (req, res) => {
           message: "Карточка с указанным _id не найдена.",
         });
       }
-      return res.status(500).send("Ошибка по умолчанию.");
+      return res.status(500).send("Ошибка со стороны сервера.");
     });
 };
 
@@ -58,7 +56,7 @@ const deleteCardsIdLikes = (req, res) => {
         });
       }
 
-      return res.status(500).send("Ошибка по умолчанию.");
+      return res.status(500).send("Ошибка со стороны сервера.");
     });
 };
 
@@ -77,10 +75,10 @@ const putCardsIdLikes = (req, res) => {
       }
       if (err.name === "ValidationError") {
         return res.status(400).send({
-          message: "Переданы некорректные данные для снятии лайка. ",
+          message: "Переданы некорректные данные для снятия лайка. ",
         });
       }
-      return res.status(500).send("Ошибка по умолчанию.");
+      return res.status(500).send("Ошибка со стороны сервера.");
     });
 };
 
@@ -91,13 +89,3 @@ module.exports = {
   deleteCardsIdLikes,
   putCardsIdLikes,
 };
-
-/* .then((card) => res.send({ data: card }))
-    .then((card) => {
-      if (!card) {
-        return res
-          .status(404)
-          .send({ message: "Передан несуществующий _id карточки" });
-      }
-      return res.send(card);
-    })*/
