@@ -33,9 +33,9 @@ const getUserId = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.kind === "ObjectId") {
         return res.status(400).send({
-          message: "Пользователь по указанному _id не найден.",
+          message: "Переданы некорректные данные при создании пользователя.",
         });
       }
       return res.status(500).send({ message: "Ошибка со стороны сервера." });
