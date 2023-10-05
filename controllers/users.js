@@ -89,7 +89,7 @@ const patchUsersMeAvatar = async (req, res) => {
     const patchAvatar = await User.findByIdAndUpdate(req.params.id, { avatar });
 
     if (!patchAvatar) {
-      throw new Error("NotFound");
+      throw new Error("NotFoundError");
     }
 
     return res.send(patchAvatar);
@@ -99,7 +99,7 @@ const patchUsersMeAvatar = async (req, res) => {
         message: "Переданы некорректные данные при поиске аватара.",
       });
     }
-    if (error.message === "NotFound") {
+    if (error.message === "NotFoundError") {
       return res
         .status(404)
         .send({ message: "Aватар по указанному _id не найден." });
