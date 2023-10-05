@@ -1,65 +1,87 @@
 const User = require("../models/user.js");
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      return res.status(500).send("Ошибка со стороны сервера.");
-    });
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (error) {
+    res.status(500).send({ message: "Ошибка на стороне сервера", error });
+  }
 };
 
-const postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+const getUserId = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
 
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные при создании пользователя.",
-        });
-      }
-      return res.status(500).send({ message: "Ошибка со стороны сервера." });
-    });
+    if (!user) {
+      throw new Error("NotFound");
+    }
+
+    return res.send(user);
+  } catch (error) {
+    if (error.name === "NotFound") {
+      return res
+        .status(404)
+        .send({ message: "Пользователь по указанному _id не найден." });
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).send({
+        message: "Переданы некорректные данные при поиске пользователя.",
+      });
+    }
+
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
+  }
 };
 
-const getUserId = (req, res) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        res
-          .status(404)
-          .send({ message: "Пользователь по указанному _id в БД не найден." });
-      }
-    })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(400).send({
-          message: "Пользователь по указанному _id не найден.",
-        });
-      }
-      return res.status(500).send({ message: "Ошибка со стороны сервера." });
-    });
+const postUser = async (req, res) => {
+  try {
+    const { name, about, avatar } = req.body;
+    const newUser = await User.create({ name, about, avatar });
+    return res.send(newUser);
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      res.status(400).send({
+        message: "Переданы некорректные данные при создании пользователя.",
+      });
+    }
+
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
+  }
 };
 
-const patchUsersMe = (req, res) => {
-  const { name, about } = req.body;
+const patchUsersMe = async (req, res) => {
+  try {
+    const { name, about } = req.body;
+    const patchUser = await User.findByIdAndUpdate({ name, about });
 
-  User.findByIdAndUpdate(req.params.id, { name, about })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(404).send({
-          message: "Пользователь по указанному _id не найден.",
-        });
-      }
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные при обновлении профиля.",
-        });
-      }
-      res.status(500).send({ message: "Ошибка в обновлении профиля" });
-    });
+    if (!patchUser) {
+      throw new Error("NotFound");
+    }
+
+    return res.send(patchUser);
+  } catch (error) {
+    if (error.name === "NotFound") {
+      return res
+        .status(404)
+        .send({ message: "Пользователь по указанному _id не найден." });
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).send({
+        message: "Переданы некорректные данные при поиске пользователя.",
+      });
+    }
+
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
+  }
 };
 
 const patchUsersMeAvatar = (req, res) => {
@@ -89,3 +111,64 @@ module.exports = {
   patchUsersMe,
   patchUsersMeAvatar,
 };
+
+/* const postUser = (req, res) => {
+  const { name, about, avatar } = req.body;
+
+  User.create({ name, about, avatar })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(400).send({
+          message: "Переданы некорректные данные при создании пользователя.",
+        });
+      }
+      return res.status(500).send({ message: "Ошибка со стороны сервера." });
+    });
+}; */
+
+/* const getUserId = (req, res) => {
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        res
+          .status(404)
+          .send({ message: "Пользователь по указанному _id в БД не найден." });
+      }
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(400).send({
+          message: "Пользователь по указанному _id не найден.",
+        });
+      }
+      return res.status(500).send({ message: "Ошибка со стороны сервера." });
+    });
+
+
+    if (!user) {
+      throw new Error("NotFound");
+    }
+};
+
+
+
+/* const patchUsersMe = (req, res) => {
+  const { name, about } = req.body;
+
+  User.findByIdAndUpdate(req.params.id, { name, about })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(404).send({
+          message: "Пользователь по указанному _id не найден.",
+        });
+      }
+      if (err.name === "ValidationError") {
+        return res.status(400).send({
+          message: "Переданы некорректные данные при обновлении профиля.",
+        });
+      }
+      res.status(500).send({ message: "Ошибка в обновлении профиля" });
+    });
+}; */
