@@ -66,7 +66,7 @@ const patchUsersMe = async (req, res) => {
 
     return res.send(patchUser);
   } catch (error) {
-    if (error.name === "NotFound") {
+    if (error.message === "NotFound") {
       return res
         .status(404)
         .send({ message: "Пользователь по указанному _id не найден." });
@@ -84,7 +84,36 @@ const patchUsersMe = async (req, res) => {
   }
 };
 
-const patchUsersMeAvatar = (req, res) => {
+const patchUsersMeAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    const patchAvatar = await User.findByIdAndUpdate(req.params.id, { avatar });
+
+    if (!patchAvatar) {
+      throw new Error("NotFound");
+    }
+
+    return res.send(patchAvatar);
+  } catch (error) {
+    if (error.message === "NotFound") {
+      return res
+        .status(404)
+        .send({ message: "Пользователь по указанному _id не найден." });
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).send({
+        message: "Переданы некорректные данные при поиске пользователя.",
+      });
+    }
+
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
+  }
+};
+
+/* const patchUsersMeAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.params.id, { avatar })
@@ -102,7 +131,7 @@ const patchUsersMeAvatar = (req, res) => {
       }
       res.status(500).send({ message: "Ошибка в обновлении профиля" });
     });
-};
+}; */
 
 module.exports = {
   getUsers,
