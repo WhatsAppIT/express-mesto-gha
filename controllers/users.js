@@ -19,13 +19,7 @@ const getUserId = async (req, res) => {
 
     return res.send(user);
   } catch (error) {
-    if (error.name === "NotFound") {
-      return res
-        .status(404)
-        .send({ message: "Пользователь по указанному _id не найден." });
-    }
-
-    if (error.name === "ValidationError") {
+    if (error.message === "NotFound") {
       return res
         .status(404)
         .send({ message: "Пользователь по указанному _id не найден." });
