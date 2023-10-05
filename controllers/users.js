@@ -72,7 +72,7 @@ const patchUsersMe = async (req, res) => {
         .send({ message: "Пользователь по указанному _id не найден." });
     }
 
-    if (error.name === "CastError") {
+    if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные при поиске пользователя.",
       });
@@ -87,11 +87,7 @@ const patchUsersMe = async (req, res) => {
 const patchUsersMeAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    const patchAvatar = await User.findByIdAndUpdate(
-      req.params.id,
-      { avatar },
-      { new: true, runValidators: true }
-    );
+    const patchAvatar = await User.findByIdAndUpdate(req.params.id, { avatar });
 
     if (!patchAvatar) {
       throw new Error("NotFound");
@@ -105,7 +101,7 @@ const patchUsersMeAvatar = async (req, res) => {
         .send({ message: "Aватар по указанному _id не найден." });
     }
 
-    if (error.name === "CastError") {
+    if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные при поиске аватара.",
       });
