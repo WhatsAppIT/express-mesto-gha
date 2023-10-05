@@ -66,16 +66,15 @@ const patchUsersMe = async (req, res) => {
 
     return res.send(patchUser);
   } catch (error) {
-    if (error.message === "NotFound") {
-      return res
-        .status(404)
-        .send({ message: "Пользователь по указанному _id не найден." });
-    }
-
     if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные при поиске пользователя.",
       });
+    }
+    if (error.message === "NotFound") {
+      return res
+        .status(404)
+        .send({ message: "Пользователь по указанному _id не найден." });
     }
 
     return res
@@ -95,16 +94,15 @@ const patchUsersMeAvatar = async (req, res) => {
 
     return res.send(patchAvatar);
   } catch (error) {
-    if (error.message === "NotFound") {
-      return res
-        .status(404)
-        .send({ message: "Aватар по указанному _id не найден." });
-    }
-
     if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные при поиске аватара.",
       });
+    }
+    if (error.message === "NotFound") {
+      return res
+        .status(404)
+        .send({ message: "Aватар по указанному _id не найден." });
     }
 
     return res
@@ -112,26 +110,6 @@ const patchUsersMeAvatar = async (req, res) => {
       .send({ message: "Ошибка на стороне сервера", error });
   }
 };
-
-/* const patchUsersMeAvatar = (req, res) => {
-  const { avatar } = req.body;
-
-  User.findByIdAndUpdate(req.params.id, { avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(404).send({
-          message: "Пользователь с указанным _id не найден.",
-        });
-      }
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные при обновлении аватара.",
-        });
-      }
-      res.status(500).send({ message: "Ошибка в обновлении профиля" });
-    });
-}; */
 
 module.exports = {
   getUsers,
@@ -153,6 +131,25 @@ module.exports = {
         });
       }
       return res.status(500).send({ message: "Ошибка со стороны сервера." });
+    });
+}; */
+/* const patchUsersMeAvatar = (req, res) => {
+  const { avatar } = req.body;
+
+  User.findByIdAndUpdate(req.params.id, { avatar })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(404).send({
+          message: "Пользователь с указанным _id не найден.",
+        });
+      }
+      if (err.name === "ValidationError") {
+        return res.status(400).send({
+          message: "Переданы некорректные данные при обновлении аватара.",
+        });
+      }
+      res.status(500).send({ message: "Ошибка в обновлении профиля" });
     });
 }; */
 
