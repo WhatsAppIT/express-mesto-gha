@@ -87,7 +87,11 @@ const patchUsersMe = async (req, res) => {
 const patchUsersMeAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    const patchAvatar = await User.findByIdAndUpdate(req.params.id, { avatar });
+    const patchAvatar = await User.findByIdAndUpdate(
+      req.params.id,
+      { avatar },
+      { new: true, runValidators: true }
+    );
 
     if (!patchAvatar) {
       throw new Error("NotFound");
@@ -98,12 +102,12 @@ const patchUsersMeAvatar = async (req, res) => {
     if (error.message === "NotFound") {
       return res
         .status(404)
-        .send({ message: "Пользователь по указанному _id не найден." });
+        .send({ message: "Aватар по указанному _id не найден." });
     }
 
     if (error.name === "CastError") {
       return res.status(400).send({
-        message: "Переданы некорректные данные при поиске пользователя.",
+        message: "Переданы некорректные данные при поиске аватара.",
       });
     }
 
