@@ -60,16 +60,20 @@ const postUser = async (req, res) => {
 const patchUsersMe = async (req, res) => {
   try {
     const { name, about } = req.body;
-    const patchUser = await User.findByIdAndUpdate(req.user._id, {
-      name,
-      about,
-    });
+    const patchUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        name,
+        about,
+      },
+      { new: true, runValidators: true }
+    );
 
     if (!patchUser) {
       throw new Error("NotFoundUser");
     }
 
-    return res.status(200).send(patchUser);
+    return res.send(patchUser);
   } catch (error) {
     if (error.message === "NotFoundUser") {
       return res
@@ -91,7 +95,11 @@ const patchUsersMe = async (req, res) => {
 const patchUsersMeAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    const patchAvatar = await User.findByIdAndUpdate(req.params.id, { avatar });
+    const patchAvatar = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true, runValidators: true }
+    );
 
     if (!patchAvatar) {
       throw new Error("NotFoundError");
