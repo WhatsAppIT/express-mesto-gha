@@ -1,4 +1,10 @@
-const User = require("../models/user.js");
+const User = require('../models/user');
+
+const {
+  ValidationError = 400,
+  NotFound = 404,
+  ServerError = 500,
+} = process.env;
 
 const getUsers = async (req, res) => {
   try {
@@ -6,8 +12,8 @@ const getUsers = async (req, res) => {
     return res.send(users);
   } catch (error) {
     return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+      .status(ServerError)
+      .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
 
@@ -16,26 +22,26 @@ const getUserId = async (req, res) => {
     const user = await User.findById(req.params.userId);
 
     if (!user) {
-      throw new Error("NotFound");
+      throw new Error('NotFound');
     }
 
     return res.send(user);
   } catch (error) {
-    if (error.message === "NotFound") {
+    if (error.message === 'NotFound') {
       return res
-        .status(404)
-        .send({ message: "Пользователь по указанному _id не найден." });
+        .status(NotFound)
+        .send({ message: 'Пользователь по указанному _id не найден.' });
     }
 
-    if (error.name === "CastError") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные при поиске пользователя.",
+    if (error.name === 'CastError') {
+      return res.status(ValidationError).send({
+        message: 'Переданы некорректные данные при поиске пользователя.',
       });
     }
 
     return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+      .status(ServerError)
+      .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
 
@@ -45,15 +51,15 @@ const postUser = async (req, res) => {
     const newUser = await User.create({ name, about, avatar });
     return res.send(newUser);
   } catch (error) {
-    if (error.name === "ValidationError") {
-      res.status(400).send({
-        message: "Переданы некорректные данные при создании пользователя.",
+    if (error.name === 'ValidationError') {
+      return res.status(ValidationError).send({
+        message: 'Переданы некорректные данные при создании пользователя.',
       });
     }
 
     return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+      .status(ServerError)
+      .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
 
@@ -66,29 +72,28 @@ const patchUsersMe = async (req, res) => {
         name,
         about,
       },
-      { new: true, runValidators: true }
     );
 
     if (!patchUser) {
-      throw new Error("NotFoundUser");
+      throw new Error('NotFoundUser');
     }
 
     return res.send(patchUser);
   } catch (error) {
-    if (error.message === "NotFoundUser") {
+    if (error.message === 'NotFoundUser') {
       return res
-        .status(404)
-        .send({ message: "Пользователь по указанному _id не найден." });
+        .status(NotFound)
+        .send({ message: 'Пользователь по указанному _id не найден.' });
     }
-    if (error.name === "ValidationError") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные при поиске пользователя.",
+    if (error.name === 'ValidationError') {
+      return res.status(ValidationError).send({
+        message: 'Переданы некорректные данные при поиске пользователя.',
       });
     }
 
     return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+      .status(ServerError)
+      .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
 
@@ -98,29 +103,28 @@ const patchUsersMeAvatar = async (req, res) => {
     const patchAvatar = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true, runValidators: true }
     );
 
     if (!patchAvatar) {
-      throw new Error("NotFoundError");
+      throw new Error('NotFoundError');
     }
 
     return res.send(patchAvatar);
   } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные при поиске аватара.",
+    if (error.name === 'ValidationError') {
+      return res.status(ValidationError).send({
+        message: 'Переданы некорректные данные при поиске аватара.',
       });
     }
-    if (error.message === "NotFoundError") {
+    if (error.message === 'NotFoundError') {
       return res
         .status(404)
-        .send({ message: "Aватар по указанному _id не найден." });
+        .send({ message: 'Aватар по указанному _id не найден.' });
     }
 
     return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+      .status(ServerError)
+      .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
 

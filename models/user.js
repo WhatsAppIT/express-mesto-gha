@@ -1,14 +1,14 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-(userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: {
         value: true,
-        message: "Поле name является обязательным",
+        message: 'Поле name является обязательным',
       },
-      minlength: [2, "минимальная длинна 2 символа"],
+      minlength: [2, 'минимальная длинна 2 символа'],
       maxlength: 30,
     },
     about: {
@@ -22,6 +22,6 @@ const mongoose = require("mongoose");
       required: true,
     },
   },
-  { versionKey: false, timestamps: true }
-)),
-  (module.exports = mongoose.model("user", userSchema));
+  { versionKey: false, timestamps: true },
+);
+module.exports = mongoose.model('user', userSchema);
