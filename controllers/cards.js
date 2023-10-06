@@ -100,16 +100,17 @@ const putCardsIdLikes = async (req, res) => {
 
     return res.send(putLike);
   } catch (error) {
-    if (error.message === "NotFound") {
-      return res.status(404).send({
-        message: "Карточка с указанным _id не найдена.",
-      });
-    }
     if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные для снятия лайка. ",
       });
     }
+    if (error.message === "NotFound") {
+      return res.status(404).send({
+        message: "Карточка с указанным _id не найдена.",
+      });
+    }
+
     return res.status(500).send("Ошибка со стороны сервера.");
   }
 };
