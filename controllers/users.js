@@ -2,7 +2,7 @@ const User = require('../models/user');
 
 const {
   ValidationError = 400,
-  NotFound = 404,
+  NotFoundError = 404,
   ServerError = 500,
 } = process.env;
 
@@ -29,7 +29,7 @@ const getUserId = async (req, res) => {
   } catch (error) {
     if (error.message === 'NotFound') {
       return res
-        .status(NotFound)
+        .status(NotFoundError)
         .send({ message: 'Пользователь по указанному _id не найден.' });
     }
 
@@ -82,7 +82,7 @@ const patchUsersMe = async (req, res) => {
   } catch (error) {
     if (error.message === 'NotFoundUser') {
       return res
-        .status(NotFound)
+        .status(NotFoundError)
         .send({ message: 'Пользователь по указанному _id не найден.' });
     }
     if (error.name === 'ValidationError') {
@@ -106,19 +106,19 @@ const patchUsersMeAvatar = async (req, res) => {
     );
 
     if (!patchAvatar) {
-      throw new Error('NotFoundError');
+      throw new Error('NotFoundErr');
     }
 
     return res.send(patchAvatar);
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.name === 'ValidationErr') {
       return res.status(ValidationError).send({
         message: 'Переданы некорректные данные при поиске аватара.',
       });
     }
-    if (error.message === 'NotFoundError') {
+    if (error.message === 'NotFoundErr') {
       return res
-        .status(404)
+        .status(NotFoundError)
         .send({ message: 'Aватар по указанному _id не найден.' });
     }
 
