@@ -60,23 +60,26 @@ const postUser = async (req, res) => {
 const patchUsersMe = async (req, res) => {
   try {
     const { name, about } = req.body;
-    const patchUser = await User.findByIdAndUpdate({ name, about });
+    const patchUser = await User.findByIdAndUpdate(req.user._id, {
+      name,
+      about,
+    });
 
     if (!patchUser) {
-      throw new Error("NotFound");
+      throw new Error("NotFoundUser");
     }
 
-    return res.send(patchUser);
+    return res.status(200).send(patchUser);
   } catch (error) {
+    if (error.message === "NotFoundUser") {
+      return res
+        .status(404)
+        .send({ message: "Пользователь по указанному _id не найден." });
+    }
     if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные при поиске пользователя.",
       });
-    }
-    if (error.message === "NotFound") {
-      return res
-        .status(404)
-        .send({ message: "Пользователь по указанному _id не найден." });
     }
 
     return res
