@@ -74,7 +74,7 @@ const deleteCardsIdLikes = async (req, res) => {
         message: "Карточка с указанным _id не найдена.",
       });
     }
-    if (err.name === "ValidationError") {
+    if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные для снятии лайка. ",
       });
@@ -98,12 +98,12 @@ const putCardsIdLikes = async (req, res) => {
 
     return res.send(putLike);
   } catch (error) {
-    if (err.name === "NotFound") {
+    if (error.name === "NotFound") {
       return res.status(404).send({
         message: "Карточка с указанным _id не найдена.",
       });
     }
-    if (err.name === "ValidationError") {
+    if (error.name === "ValidationError") {
       return res.status(400).send({
         message: "Переданы некорректные данные для снятия лайка. ",
       });
