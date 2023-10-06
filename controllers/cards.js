@@ -98,7 +98,7 @@ const putCardsIdLikes = async (req, res) => {
 
     return res.send(putLike);
   } catch (error) {
-    if (error.name === "NotFound") {
+    if (error.message === "NotFound") {
       return res.status(404).send({
         message: "Карточка с указанным _id не найдена.",
       });
