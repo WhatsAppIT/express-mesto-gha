@@ -81,11 +81,6 @@ const deleteCardsIdLikes = async (req, res) => {
         message: "Переданы некорректные данные для снятия лайка. ",
       });
     }
-    if (error.name === "ValidationError") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные для снятии лайка. ",
-      });
-    }
 
     return res
       .status(500)
@@ -107,12 +102,6 @@ const putCardsIdLikes = async (req, res) => {
 
     return res.send(putLike);
   } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные для снятия лайка. ",
-      });
-    }
-
     if (error.kind === "ObjectId") {
       return res.status(400).send({
         message: "Переданы некорректные данные для снятия лайка. ",
