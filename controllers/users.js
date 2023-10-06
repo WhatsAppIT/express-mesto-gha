@@ -72,6 +72,7 @@ const patchUsersMe = async (req, res) => {
         name,
         about,
       },
+      { new: true, runValidators: true },
     );
 
     if (!patchUser) {
@@ -103,6 +104,7 @@ const patchUsersMeAvatar = async (req, res) => {
     const patchAvatar = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
+      { new: true, runValidators: true },
     );
 
     if (!patchAvatar) {
