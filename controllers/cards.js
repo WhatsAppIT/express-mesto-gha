@@ -1,30 +1,63 @@
 const Card = require("../models/card.js");
 
-const getCards = (req, res) => {
-  Card.find({})
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      return res.status(500).send("Ошибка со стороны сервера.");
-    });
+const getCards = async (req, res) => {
+  try {
+    const cards = await Card.find({});
+    return res.send(cards);
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
+  }
 };
 
-const postCard = (req, res) => {
-  const { name, link } = req.body;
-  const owner = req.user._id;
+const postCard = async (req, res) => {
+  try {
+    const { name, link, owner } = req.body;
+    const newCard = await Card.create({ name, link, owner });
+    return res.send(newCard);
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      res.status(400).send({
+        message: "Переданы некорректные данные при создании карточки.",
+      });
+    }
 
-  Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные при создании карточки.",
-        });
-      }
-      return res.status(500).send("Ошибка со стороны сервера.");
-    });
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
+  }
 };
 
-const deleteCardId = (req, res) => {
+const deleteCardId = async (req, res) => {
+  try {
+    const deleteCard = Card.findByIdAndRemove(req.params.cardId);
+
+    if (!deleteCard) {
+      throw new Error("NotFound");
+    }
+
+    return res.send(deleteCard);
+  } catch (error) {
+    if (error.message === "NotFound") {
+      return res
+        .status(404)
+        .send({ message: "Карточка по указанному _id не найдена." });
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).send({
+        message: "Переданы некорректные данные при поиске карточки.",
+      });
+    }
+
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
+  }
+};
+
+/* const deleteCardId = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => res.send({ data: card }))
     .catch((err) => {
@@ -35,7 +68,7 @@ const deleteCardId = (req, res) => {
       }
       return res.status(500).send("Ошибка со стороны сервера.");
     });
-};
+}; */
 
 const deleteCardsIdLikes = (req, res) => {
   Card.findByIdAndUpdate(
@@ -89,3 +122,27 @@ module.exports = {
   deleteCardsIdLikes,
   putCardsIdLikes,
 };
+
+/* const postCard = (req, res) => {
+  const { name, link } = req.body;
+  const owner = req.user._id;
+
+  Card.create({ name, link, owner })
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(400).send({
+          message: "Переданы некорректные данные при создании карточки.",
+        });
+      }
+      return res.status(500).send("Ошибка со стороны сервера.");
+    });
+};
+
+/* const getCards = (req, res) => {
+  Card.find({})
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      return res.status(500).send("Ошибка со стороны сервера.");
+    });
+}; */

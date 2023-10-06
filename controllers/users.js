@@ -3,9 +3,11 @@ const User = require("../models/user.js");
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    res.send(users);
+    return res.send(users);
   } catch (error) {
-    res.status(500).send({ message: "Ошибка на стороне сервера", error });
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
   }
 };
 
