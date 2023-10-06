@@ -19,6 +19,9 @@ app.use((req, res, next) => {
 
 app.use("/users", routerUsers);
 app.use("/cards", routerCards);
+app.use("*", (req, res) => {
+  res.status(404).send({ message: "Страница не найдена" });
+});
 
 async function init() {
   await mongoose.connect("mongodb://127.0.0.1:27017/mestodb");
