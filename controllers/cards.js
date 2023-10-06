@@ -57,25 +57,12 @@ const deleteCardId = async (req, res) => {
   }
 };
 
-/* const deleteCardId = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(404).send({
-          message: "Карточка с указанным _id не найдена.",
-        });
-      }
-      return res.status(500).send("Ошибка со стороны сервера.");
-    });
-}; */
-
 const deleteCardsIdLikes = async (req, res) => {
   try {
     const deleteLike = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } }, // убрать _id из массива
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!deleteLike) {
@@ -104,7 +91,7 @@ const putCardsIdLikes = async (req, res) => {
     const putLike = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!putLike) {
@@ -155,6 +142,18 @@ module.exports = {
   Card.find({})
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      return res.status(500).send("Ошибка со стороны сервера.");
+    });
+};
+/* const deleteCardId = (req, res) => {
+  Card.findByIdAndRemove(req.params.cardId)
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(404).send({
+          message: "Карточка с указанным _id не найдена.",
+        });
+      }
       return res.status(500).send("Ошибка со стороны сервера.");
     });
 }; */
