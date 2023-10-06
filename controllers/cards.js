@@ -17,25 +17,27 @@ const postCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
+    .catch((error) => {
+      if (error.name === "ValidationError") {
         return res.status(400).send({
           message: "Переданы некорректные данные при создании карточки.",
         });
       }
-      return res.status(500).send("Ошибка со стороны сервера.");
+      return res
+        .status(500)
+        .send({ message: "Ошибка со стороны сервера.", error });
     });
 };
 
 const deleteCardId = async (req, res) => {
   try {
-    const deleteCard = Card.findByIdAndRemove(req.params.cardId);
+    const card = await Card.findByIdAndRemove(req.params.cardId);
 
-    if (!deleteCard) {
+    if (!card) {
       throw new Error("NotFound");
     }
 
-    return res.send(deleteCard);
+    return res.send(card);
   } catch (error) {
     if (error.message === "NotFound") {
       return res
