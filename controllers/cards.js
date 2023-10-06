@@ -11,22 +11,20 @@ const getCards = async (req, res) => {
   }
 };
 
-const postCard = async (req, res) => {
-  try {
-    const { name, link, owner } = req.body;
-    const newCard = await Card.create({ name, link, owner });
-    return res.send(newCard);
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      res.status(400).send({
-        message: "Переданы некорректные данные при создании карточки.",
-      });
-    }
+const postCard = (req, res) => {
+  const { name, link } = req.body;
+  const owner = req.user._id;
 
-    return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
-  }
+  Card.create({ name, link, owner })
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(400).send({
+          message: "Переданы некорректные данные при создании карточки.",
+        });
+      }
+      return res.status(500).send("Ошибка со стороны сервера.");
+    });
 };
 
 const deleteCardId = async (req, res) => {
