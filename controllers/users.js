@@ -1,10 +1,10 @@
 const User = require('../models/user');
 
-const {
+/* const {
   ValidationError = 400,
-  NotFoundError = 404,
+  NotFound = 404,
   ServerError = 500,
-} = process.env;
+} = process.env; */
 
 const getUsers = async (req, res) => {
   try {
@@ -12,7 +12,7 @@ const getUsers = async (req, res) => {
     return res.send(users);
   } catch (error) {
     return res
-      .status(ServerError)
+      .status(500)
       .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
@@ -29,18 +29,18 @@ const getUserId = async (req, res) => {
   } catch (error) {
     if (error.message === 'NotFound') {
       return res
-        .status(NotFoundError)
+        .status(404)
         .send({ message: 'Пользователь по указанному _id не найден.' });
     }
 
     if (error.name === 'CastError') {
-      return res.status(ValidationError).send({
+      return res.status(400).send({
         message: 'Переданы некорректные данные при поиске пользователя.',
       });
     }
 
     return res
-      .status(ServerError)
+      .status(500)
       .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
@@ -52,13 +52,13 @@ const postUser = async (req, res) => {
     return res.send(newUser);
   } catch (error) {
     if (error.name === 'ValidationError') {
-      return res.status(ValidationError).send({
+      return res.status(400).send({
         message: 'Переданы некорректные данные при создании пользователя.',
       });
     }
 
     return res
-      .status(ServerError)
+      .status(500)
       .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
@@ -82,17 +82,17 @@ const patchUsersMe = async (req, res) => {
   } catch (error) {
     if (error.message === 'NotFoundUser') {
       return res
-        .status(NotFoundError)
+        .status(404)
         .send({ message: 'Пользователь по указанному _id не найден.' });
     }
     if (error.name === 'ValidationError') {
-      return res.status(ValidationError).send({
+      return res.status(400).send({
         message: 'Переданы некорректные данные при поиске пользователя.',
       });
     }
 
     return res
-      .status(ServerError)
+      .status(500)
       .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
@@ -106,24 +106,24 @@ const patchUsersMeAvatar = async (req, res) => {
     );
 
     if (!patchAvatar) {
-      throw new Error('NotFoundErr');
+      throw new Error('NotFoundError');
     }
 
     return res.send(patchAvatar);
   } catch (error) {
-    if (error.name === 'ValidationErr') {
-      return res.status(ValidationError).send({
+    if (error.name === 'ValidationError') {
+      return res.status(400).send({
         message: 'Переданы некорректные данные при поиске аватара.',
       });
     }
-    if (error.message === 'NotFoundErr') {
+    if (error.message === 'NotFoundError') {
       return res
-        .status(NotFoundError)
+        .status(404)
         .send({ message: 'Aватар по указанному _id не найден.' });
     }
 
     return res
-      .status(ServerError)
+      .status(500)
       .send({ message: 'Ошибка на стороне сервера', error });
   }
 };
