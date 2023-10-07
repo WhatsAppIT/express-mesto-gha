@@ -1,10 +1,9 @@
 const Card = require('../models/card');
-
 const {
-  ValidationError = 400,
-  NotFound = 404,
-  ServerError = 500,
-} = process.env;
+  ValidationError,
+  NotFound,
+  ServerError,
+} = require('../utils/constants');
 
 const getCards = async (req, res) => {
   try {
@@ -68,6 +67,7 @@ const deleteCardsIdLikes = async (req, res) => {
     const deleteLike = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
+      { new: true },
     );
 
     if (!deleteLike) {
@@ -98,6 +98,7 @@ const putCardsIdLikes = async (req, res) => {
     const putLike = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
+      { new: true },
     );
 
     if (!putLike) {

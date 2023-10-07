@@ -5,9 +5,12 @@ const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 
 const {
+  NotFound,
+} = require('./utils/constants');
+
+const {
   PORT = 3000,
   MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb',
-  NotFound = 404,
 } = process.env;
 
 const app = express();

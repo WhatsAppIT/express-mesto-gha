@@ -1,10 +1,9 @@
 const User = require('../models/user');
-
 const {
-  ValidationError = 400,
-  NotFound = 404,
-  ServerError = 500,
-} = process.env;
+  ValidationError,
+  NotFound,
+  ServerError,
+} = require('../utils/constants');
 
 const getUsers = async (req, res) => {
   try {
