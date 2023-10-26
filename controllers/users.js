@@ -46,7 +46,7 @@ const postUser = (req, res, next) => {
           next(new RepeatError("Такаой email уже зарегистрирован."));
         }
 
-        return next(new AuthError("Ошибка на сервере"));
+        return next(new ServerError("Ошибка на сервере"));
       });
   });
 };
@@ -67,7 +67,7 @@ const getProfile = (req, res, next) => {
           )
         );
       }
-      return next(new AuthError("Ошибка на сервере"));
+      return next(new ServerError("Ошибка на сервере"));
     });
 };
 
@@ -80,7 +80,7 @@ const login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      return next(new AuthError("Ошибка на сервере"));
+      return next(new ServerError("Ошибка на сервере"));
     });
 };
 
@@ -89,7 +89,7 @@ const getUsers = async (req, res, next) => {
     const users = await User.find({});
     return res.send(users);
   } catch (err) {
-    return next(new AuthError("Ошибка на сервере"));
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
@@ -117,7 +117,7 @@ const getUserId = async (req, res, next) => {
       );
     }
 
-    return next(new AuthError("Ошибка на сервере"));
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
@@ -152,7 +152,7 @@ const patchUsersMe = async (req, res, next) => {
       );
     }
 
-    return next(new AuthError("Ошибка на сервере"));
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
@@ -182,7 +182,7 @@ const patchUsersMeAvatar = async (req, res, next) => {
       return next(new NotFoundError("Аватар по указанному _id не найден."));
     }
 
-    return next(new AuthError("Ошибка на сервере"));
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
