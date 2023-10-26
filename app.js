@@ -2,14 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const { celebrate, Joi } = require("celebrate");
+const { celebrate, Joi, errors } = require("celebrate");
 const { login, postUser } = require("./controllers/users");
 const auth = require("./middlewares/auth");
 //const ServerError = require("./middlewares/ServerError");
 const routerUsers = require("./routes/users");
 const routerCards = require("./routes/cards");
 
-const { NotFound } = require("./utils/constants");
+//const { ServerError } = require("./utils/constants");
 const { linkRegex } = require("./utils/constants");
 
 const { PORT = 3000, MONGO_URL = "mongodb://127.0.0.1:27017/mestodb" } =
@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.post(
+app.use(
   "/signin",
   auth,
   celebrate({
@@ -33,7 +33,7 @@ app.post(
   login
 );
 
-app.post(
+app.use(
   "/signup",
   auth,
   celebrate({
@@ -51,12 +51,15 @@ app.post(
 
 app.use("/users", routerUsers);
 app.use("/cards", routerCards);
-app.use("*", (req, res) => {
-  res.status(NotFound).send({ message: "Страница не найдена" });
+app.use("*", (req, res, next) => {
+  next(new NotFoundError("Страница не найдена"));
 });
 
+app.use(errors());
+
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
+  res.status(500).send("Ошибка на сервере");
+  next();
 });
 
 async function init() {

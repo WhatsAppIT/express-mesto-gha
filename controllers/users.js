@@ -33,8 +33,8 @@ const postUser = (req, res, next) => {
 
         return res.send(user);
       })
-      .catch((error) => {
-        if (error.name === "ValidationError") {
+      .catch((err) => {
+        if (err.name === "ValidationError") {
           return next(
             new ValidationError(
               "Переданы некорректные данные при создании пользователя."
@@ -42,11 +42,11 @@ const postUser = (req, res, next) => {
           );
         }
 
-        if (error.code === MONGO_DUBLICATE_ERROR_CODE) {
-          return next(new RepeatError("Такаой email уже зарегистрирован."));
+        if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
+          next(new RepeatError("Такаой email уже зарегистрирован."));
         }
 
-        return next(new ServerError("Ошибка на сервере"));
+        return next(new AuthError("Ошибка на сервере"));
       });
   });
 };
@@ -59,16 +59,16 @@ const getProfile = (req, res, next) => {
       }
       return res.send({ data: user });
     })
-    .catch(next);
-  /* if (err.name === "CastError") {
-      return next(
-        new ValidationError(
-          "Переданы некорректные данные при поиске пользователя."
-        )
-      );
-    }
-    return next(new ServerError("Ошибка на сервере"));
-  } */
+    .catch((err) => {
+      if (err.kind === "ObjectId") {
+        return next(
+          new ValidationError(
+            "Переданы некорректные данные при поиске пользователя."
+          )
+        );
+      }
+      return next(new AuthError("Ошибка на сервере"));
+    });
 };
 
 const login = (req, res, next) => {
@@ -77,15 +77,9 @@ const login = (req, res, next) => {
   User.findUserByCredentials({ email, password })
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
-      res
-        .cookie("jwt", token, {
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          httpOnly: true,
-          sameSite: true,
-        })
-        .end();
+      res.send({ token });
     })
-    .catch((error) => {
+    .catch((err) => {
       return next(new AuthError("Ошибка на сервере"));
     });
 };
@@ -94,8 +88,8 @@ const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     return res.send(users);
-  } catch (error) {
-    return next(new ServerError("Ошибка на сервере"));
+  } catch (err) {
+    return next(new AuthError("Ошибка на сервере"));
   }
 };
 
@@ -108,20 +102,22 @@ const getUserId = async (req, res, next) => {
     }
 
     return res.send(user);
-  } catch (error) {
-    if (error.message === "NotFound") {
-      return res
-        .status(NotFound)
-        .send({ message: "Пользователь по указанному _id не найден." });
+  } catch (err) {
+    if (err.message === "NotFound") {
+      return next(
+        new NotFoundError("Пользователь по указанному _id не найден.")
+      );
     }
 
-    if (error.name === "CastError") {
-      return res.status(ValidationError).send({
-        message: "Переданы некорректные данные при поиске пользователя.",
-      });
+    if (err.name === "CastError") {
+      return next(
+        new ValidationError(
+          "Переданы некорректные данные при поиске пользователя."
+        )
+      );
     }
 
-    return next(new ServerError("Ошибка на сервере"));
+    return next(new AuthError("Ошибка на сервере"));
   }
 };
 
@@ -142,19 +138,21 @@ const patchUsersMe = async (req, res, next) => {
     }
 
     return res.send(patchUser);
-  } catch (error) {
-    if (error.message === "NotFoundUser") {
-      return res
-        .status(NotFound)
-        .send({ message: "Пользователь по указанному _id не найден." });
+  } catch (err) {
+    if (err.message === "NotFoundUser") {
+      return next(
+        new NotFoundError("Пользователь по указанному _id не найден.")
+      );
     }
-    if (error.name === "ValidationError") {
-      return res.status(ValidationError).send({
-        message: "Переданы некорректные данные при поиске пользователя.",
-      });
+    if (err.name === "ValidationError") {
+      return next(
+        new ValidationError(
+          "Переданы некорректные данные при поиске пользователя."
+        )
+      );
     }
 
-    return next(new ServerError("Ошибка на сервере"));
+    return next(new AuthError("Ошибка на сервере"));
   }
 };
 
@@ -172,19 +170,19 @@ const patchUsersMeAvatar = async (req, res, next) => {
     }
 
     return res.send(patchAvatar);
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(ValidationError).send({
-        message: "Переданы некорректные данные при поиске аватара.",
-      });
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      return next(
+        new ValidationError(
+          "Переданы некорректные данные при поиске пользователя."
+        )
+      );
     }
-    if (error.message === "NotFoundError") {
-      return res
-        .status(NotFound)
-        .send({ message: "Aватар по указанному _id не найден." });
+    if (err.message === "NotFoundError") {
+      return next(new NotFoundError("Аватар по указанному _id не найден."));
     }
 
-    return next(new ServerError("Ошибка на сервере"));
+    return next(new AuthError("Ошибка на сервере"));
   }
 };
 
