@@ -1,76 +1,105 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const key = require("../utils/constants");
-const authError = require("../errors/authError");
-const {
-  ValidationError,
-  NotFound,
-  ServerError,
-} = require("../utils/constants");
+const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
+//const { STATUS_CODES } = require("node:http");
+//const { constants as HTTP_STATUS } = require('node:http2');
+//console.log(STATUS_CODES);
+//console.log(HTTP_STATUS);
 
-const getMe = (req, res, next) => {
+const { key } = process.env;
+
+const AuthError = require("../errors/AuthError");
+const ValidationError = require("../errors/ValidationError");
+const NotFoundError = require("../errors/ValidationError");
+const RepeatError = require("../errors/RepeatError");
+const ServerError = require("../errors/ServerError");
+
+const postUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body;
+
+  bcrypt.hash(req.body.password, 10).then((hash) => {
+    User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    })
+      .then((user) => {
+        if (!user) {
+          throw new NotFoundError("Нет пользователя с таким id");
+        }
+
+        return res.send(user);
+      })
+      .catch((error) => {
+        if (error.name === "ValidationError") {
+          return next(
+            new ValidationError(
+              "Переданы некорректные данные при создании пользователя."
+            )
+          );
+        }
+
+        if (error.code === MONGO_DUBLICATE_ERROR_CODE) {
+          return next(new RepeatError("Такаой email уже зарегистрирован."));
+        }
+
+        return next(new ServerError("Ошибка на сервере"));
+      });
+  });
+};
+
+const getProfile = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError("Пользователь по указанному _id не найден.");
+        throw new NotFoundError("Нет пользователя с таким id");
       }
-
-      return res.send(user);
+      return res.send({ data: user });
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return next(
-          new ValidationError(
-            "Переданы некорректные данные при поиске пользователя."
-          )
-        );
-      }
-
-      return next(err);
-    });
+    .catch(next);
+  /* if (err.name === "CastError") {
+      return next(
+        new ValidationError(
+          "Переданы некорректные данные при поиске пользователя."
+        )
+      );
+    }
+    return next(new ServerError("Ошибка на сервере"));
+  } */
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
-    .select("+password")
+  User.findUserByCredentials({ email, password })
     .then((user) => {
-      if (!user) {
-        throw new authError("Неправильный логин или пароль");
-      }
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          throw new authError("Неправильный логин или пароль");
-        }
-        const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
-        res
-          .cookie("jwt", token, {
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            httpOnly: true,
-            sameSite: true,
-          })
-          .end();
-      });
+      const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
+      res
+        .cookie("jwt", token, {
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .end();
     })
-    .catch((err) => {
-      next(err);
+    .catch((error) => {
+      return next(new AuthError("Ошибка на сервере"));
     });
 };
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     return res.send(users);
   } catch (error) {
-    return res
-      .status(ServerError)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
-const getUserId = async (req, res) => {
+const getUserId = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
 
@@ -92,40 +121,11 @@ const getUserId = async (req, res) => {
       });
     }
 
-    return res
-      .status(ServerError)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
-const postUser = async (req, res) => {
-  try {
-    const { name, about, avatar, email, password } = req.body;
-
-    bcrypt.hash(req.body.password, 10);
-
-    const newUser = await User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    });
-    return res.send(newUser);
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(ValidationError).send({
-        message: "Переданы некорректные данные при создании пользователя.",
-      });
-    }
-
-    return res
-      .status(ServerError)
-      .send({ message: "Ошибка на стороне сервера", error });
-  }
-};
-
-const patchUsersMe = async (req, res) => {
+const patchUsersMe = async (req, res, next) => {
   try {
     const { name, about } = req.body;
     const patchUser = await User.findByIdAndUpdate(
@@ -154,13 +154,11 @@ const patchUsersMe = async (req, res) => {
       });
     }
 
-    return res
-      .status(ServerError)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
-const patchUsersMeAvatar = async (req, res) => {
+const patchUsersMeAvatar = async (req, res, next) => {
   try {
     const { avatar } = req.body;
     const patchAvatar = await User.findByIdAndUpdate(
@@ -186,14 +184,12 @@ const patchUsersMeAvatar = async (req, res) => {
         .send({ message: "Aватар по указанному _id не найден." });
     }
 
-    return res
-      .status(ServerError)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(new ServerError("Ошибка на сервере"));
   }
 };
 
 module.exports = {
-  getMe,
+  getProfile,
   login,
   getUsers,
   getUserId,
@@ -201,43 +197,3 @@ module.exports = {
   patchUsersMe,
   patchUsersMeAvatar,
 };
-
-/* app.post('/signup', (req, res) => {
-  bcrypt.hash(req.body.password, 10)
-    .then((hash) => User.create({
-      email: req.body.email,
-      password: hash,
-    }))
-    .then((user) => {
-      res.status(201).send({
-        _id: user._id,
-        email: user.email,
-      });
-    })
-    .catch((err) => {
-      res.status(400).send(err);
-    });
-});
-
-app.post('/signin', (req, res) => {
-  const { email, password } = req.body;
-
-  User.findOne({ email })
-    .then((user) => {
-      if(!user){
-        return Promise.reject(new Error('Неправельные почта или пароль'))
-      }
-
-    return bcrypt.compare(password, user.password)
-    })
-    .then((matched) => {
-    if(!matched) {
-      return Promise.reject(new Error('Неправильные почта или пароль'));
-    }
-
-    res.send({ message: 'все верно' })
-  })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
-}); */

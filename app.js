@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const { celebrate, Joi } = require("celebrate");
 const { login, postUser } = require("./controllers/users");
 const auth = require("./middlewares/auth");
+//const ServerError = require("./middlewares/ServerError");
 const routerUsers = require("./routes/users");
 const routerCards = require("./routes/cards");
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.post(
   "/signin",
+  auth,
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),
@@ -33,6 +35,7 @@ app.post(
 
 app.post(
   "/signup",
+  auth,
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
@@ -44,12 +47,16 @@ app.post(
   }),
   postUser
 );
+//app.use(auth);
 
-app.use(auth);
 app.use("/users", routerUsers);
 app.use("/cards", routerCards);
 app.use("*", (req, res) => {
   res.status(NotFound).send({ message: "Страница не найдена" });
+});
+
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).send({ message: err.message });
 });
 
 async function init() {
