@@ -13,7 +13,7 @@ const { key } = process.env;
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
 const RepeatError = require("../errors/RepeatError");
-const ServerError = require("../errors/ServerError");
+//const ServerError = require("../errors/ServerError");
 
 const postUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
@@ -46,7 +46,7 @@ const postUser = (req, res, next) => {
           next(new RepeatError("Такаой email уже зарегистрирован."));
         }
 
-        return next(new ServerError("Ошибка на сервере"));
+        return next(err);
       });
   });
 };
@@ -67,7 +67,7 @@ const getProfile = (req, res, next) => {
           )
         );
       }
-      return next(new ServerError("Ошибка на сервере"));
+      return next(err);
     });
 };
 
@@ -89,7 +89,7 @@ const getUsers = async (req, res, next) => {
     const users = await User.find({});
     return res.send(users);
   } catch (err) {
-    return next(new ServerError("Ошибка на сервере"));
+    return next(err);
   }
 };
 
@@ -117,7 +117,7 @@ const getUserId = async (req, res, next) => {
       );
     }
 
-    return next(new ServerError("Ошибка на сервере"));
+    return next(err);
   }
 };
 
@@ -152,7 +152,7 @@ const patchUsersMe = async (req, res, next) => {
       );
     }
 
-    return next(new ServerError("Ошибка на сервере"));
+    return next(err);
   }
 };
 
@@ -182,7 +182,7 @@ const patchUsersMeAvatar = async (req, res, next) => {
       return next(new NotFoundError("Аватар по указанному _id не найден."));
     }
 
-    return next(new ServerError("Ошибка на сервере"));
+    return next(err);
   }
 };
 
