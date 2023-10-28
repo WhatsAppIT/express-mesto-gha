@@ -23,7 +23,7 @@ app.use(cookieParser());
 
 app.use(
   "/signin",
-  auth,
+
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),
@@ -35,7 +35,7 @@ app.use(
 
 app.use(
   "/signup",
-  auth,
+
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
@@ -47,7 +47,7 @@ app.use(
   }),
   postUser
 );
-//app.use(auth);
+app.use(auth);
 
 app.use("/users", routerUsers);
 app.use("/cards", routerCards);
