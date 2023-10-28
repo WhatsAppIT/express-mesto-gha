@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const isEmail = require("validator/lib/isEmail");
-const AuthError = require("../errors/AuthError");
+//const AuthError = require("../errors/AuthError");
 
 const userSchema = new mongoose.Schema(
   {
@@ -49,14 +49,12 @@ userSchema.statics.findUserByCredentials = function findUser(email, password) {
     .select("+password")
     .then((user) => {
       if (!user) {
-        return Promise.reject(new AuthError("Неправильные почта или пароль."));
+        return Promise.reject(new Error("Неправильные почта или пароль."));
       }
 
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return Promise.reject(
-            new AuthError("Неправильные почта или пароль.")
-          );
+          return Promise.reject(new Error("Неправильные почта или пароль."));
         }
 
         return user;
