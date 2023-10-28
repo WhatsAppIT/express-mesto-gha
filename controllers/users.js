@@ -9,7 +9,7 @@ const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
 
 const { key } = process.env;
 
-//const AuthError = require("../errors/AuthError");
+const AuthError = require("../errors/AuthError");
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
 const RepeatError = require("../errors/RepeatError");
@@ -80,7 +80,7 @@ const login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      next(new AuthError("Неправильный логин или пароль"));
     });
 };
 
@@ -89,7 +89,7 @@ const getUsers = async (req, res, next) => {
     const users = await User.find({});
     return res.send(users);
   } catch (err) {
-    return next(err);
+    next(err);
   }
 };
 
@@ -117,7 +117,7 @@ const getUserId = async (req, res, next) => {
       );
     }
 
-    return next(err);
+    next(err);
   }
 };
 
@@ -152,7 +152,7 @@ const patchUsersMe = async (req, res, next) => {
       );
     }
 
-    return next(err);
+    next(err);
   }
 };
 
@@ -182,7 +182,7 @@ const patchUsersMeAvatar = async (req, res, next) => {
       return next(new NotFoundError("Аватар по указанному _id не найден."));
     }
 
-    return next(err);
+    next(err);
   }
 };
 
