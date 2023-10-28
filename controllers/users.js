@@ -9,7 +9,7 @@ const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
 
 const { key } = process.env;
 
-const AuthError = require("../errors/AuthError");
+//const AuthError = require("../errors/AuthError");
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
 const RepeatError = require("../errors/RepeatError");
@@ -67,6 +67,7 @@ const getProfile = (req, res, next) => {
           )
         );
       }
+
       next(err);
     });
 };
