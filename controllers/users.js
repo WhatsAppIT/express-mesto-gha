@@ -46,7 +46,7 @@ const postUser = (req, res, next) => {
           next(new RepeatError("Такаой email уже зарегистрирован."));
         }
 
-        next(err);
+        return next(err);
       });
   });
 };
@@ -80,7 +80,7 @@ const login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      next(new AuthError({ message: err.message }));
+      next(err);
     });
 };
 
