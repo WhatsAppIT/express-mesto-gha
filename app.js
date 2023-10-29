@@ -63,7 +63,7 @@ app.use(errors());
 
 app.use((err, req, res, next) => {
   res.status(500).send("Ошибка на сервере");
-  //next();
+  next();
 });
 
 async function init() {
