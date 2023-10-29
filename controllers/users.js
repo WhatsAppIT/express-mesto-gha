@@ -12,7 +12,7 @@ const RepeatError = require("../errors/RepeatError");
 const postUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
 
-  bcrypt.hash(req.body.password, 10).then((hash) => {
+  bcrypt.hash(password, 10).then((hash) => {
     User.create({
       name,
       about,
