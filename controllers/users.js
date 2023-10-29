@@ -25,7 +25,7 @@ const postUser = (req, res, next) => {
           throw new NotFoundError("Нет пользователя с таким id");
         }
 
-        return res.status(201).send({
+        return res.send({
           _id: user._id,
           email: user.email,
         });
