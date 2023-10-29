@@ -49,7 +49,8 @@ const postUser = (req, res, next) => {
 };
 
 const getProfile = (req, res, next) => {
-  User.findById(req.user._id)
+  const userId = req.params.userId ? req.params.userId : req.user._id;
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError("Нет пользователя с таким id");
