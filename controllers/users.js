@@ -96,7 +96,7 @@ const login = (req, res, next) => {
 const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
-    return res.send(users);
+    res.send(users);
   } catch (err) {
     next(err);
   }
