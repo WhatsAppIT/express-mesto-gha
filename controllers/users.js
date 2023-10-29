@@ -116,7 +116,7 @@ const getUserId = async (req, res, next) => {
       );
     } */
 
-    if (err.name === "CastError") {
+    if (err.kind === "ObjectId") {
       return next(
         new ValidationError(
           "Переданы некорректные данные при поиске пользователя."
