@@ -96,9 +96,7 @@ const login = (req, res, next) => {
       });
     })
 
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(new SigninError(err.message)));
 };
 
 const getUsers = async (req, res, next) => {
