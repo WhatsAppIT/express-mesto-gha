@@ -7,7 +7,7 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
-const RepeatError = require("../errors/RepeatError");
+const ConflictError = require("../errors/ConflictError");
 
 const postUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
@@ -37,7 +37,7 @@ const postUser = (req, res, next) => {
         }
 
         if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-          next(new RepeatError("Такаой email уже зарегистрирован."));
+          next(new ConflictError("Такаой email уже зарегистрирован."));
         }
 
         return next(err);
