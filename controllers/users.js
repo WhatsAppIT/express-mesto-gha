@@ -8,6 +8,7 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
 const ConflictError = require("../errors/ConflictError");
+const SigninError = require("../errors/SigninError");
 
 const postUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
@@ -72,29 +73,41 @@ const getProfile = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  User.findOne({ email })
+    .select("+password")
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
-        {
-          expiresIn: "7d",
-        }
-      );
-      res.cookie("jwt", token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: true,
-      });
+      if (!user) {
+        throw new SigninError("Неправильные логин или пароль");
+      }
 
-      res.send({
-        _id: user._id,
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          throw new SigninError("Неправильные логин или пароль");
+        }
+        const token = jwt.sign(
+          { _id: user._id },
+          NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+          {
+            expiresIn: "7d",
+          }
+        );
+
+        res.cookie("jwt", token, {
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          sameSite: true,
+        });
+
+        res.send({
+          _id: user._id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        });
       });
     })
+
     .catch((err) => {
       next(err);
     });
