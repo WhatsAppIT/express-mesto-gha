@@ -1,14 +1,17 @@
 const bcrypt = require("bcryptjs");
+// app.js
+
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
-const key = require("../utils/constants");
+//const key = require("../utils/constants");
 //const { STATUS_CODES } = require("node:http");
 //const { constants as HTTP_STATUS } = require('node:http2');
 //console.log(STATUS_CODES);
 //console.log(HTTP_STATUS);
 
-//const { key } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 //const AuthError = require("../errors/AuthError");
 const ValidationError = require("../errors/ValidationError");
@@ -78,7 +81,13 @@ const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+        {
+          expiresIn: "7d",
+        }
+      );
       res.send({ token });
     })
     .catch((err) => {
