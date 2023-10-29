@@ -29,9 +29,9 @@ const postUser = (req, res, next) => {
       password: hash,
     })
       .then((user) => {
-        /*         if (!user) {
+        if (!user) {
           throw new NotFoundError("Нет пользователя с таким id");
-        } */
+        }
 
         return res.send(user);
       })
