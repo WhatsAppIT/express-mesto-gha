@@ -1,6 +1,4 @@
 const bcrypt = require("bcryptjs");
-// app.js
-
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
@@ -31,9 +29,9 @@ const postUser = (req, res, next) => {
       password: hash,
     })
       .then((user) => {
-        if (!user) {
+        /*         if (!user) {
           throw new NotFoundError("Нет пользователя с таким id");
-        }
+        } */
 
         return res.send(user);
       })
