@@ -32,15 +32,21 @@ const postUser = (req, res, next) => {
       })
       .catch((err) => {
         if (err.name === "ValidationError") {
-          return next(
+          res
+            .status(409)
+            .send("Переданы некорректные данные при создании пользователя.");
+          /*           return next(
             new ValidationError(
               "Переданы некорректные данные при создании пользователя."
             )
-          );
+          ); */
         }
 
         if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-          return next(new ConflictError("Такаой email уже зарегистрирован."));
+          res
+            .status(400)
+            .send("Переданы некорректные данные при создании пользователя.");
+          //return next(new ConflictError("Такаой email уже зарегистрирован."));
         }
 
         return next(err);
