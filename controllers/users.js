@@ -30,16 +30,15 @@ const postUser = (req, res, next) => {
       .catch((err) => {
         if (err.code === 11000) {
           next(new RepeatError("Такаой email уже зарегистрирован."));
-        }
-        if (err.name === "ValidationError") {
+        } else if (err.name === "ValidationError") {
           return next(
             new ValidationError(
               "Переданы некорректные данные при создании пользователя."
             )
           );
+        } else {
+          next(err);
         }
-
-        return next(err);
       });
   });
 };
