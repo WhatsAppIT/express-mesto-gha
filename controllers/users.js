@@ -75,13 +75,26 @@ const getProfile = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  User.findOne({ email })
+    .select("+password")
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
-      res.send({ token });
-    })
-    .catch((err) => {
-      next(err);
+      if (!user) {
+        throw new SigninError("Неправильная почта или пароль.");
+      }
+
+      return bcrypt
+        .compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            throw new SigninError("Неправильная почта или пароль.");
+          }
+
+          const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
+          res.send({ token });
+        })
+        .catch((err) => {
+          next(err);
+        });
     });
 };
 
