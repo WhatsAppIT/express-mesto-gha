@@ -4,7 +4,7 @@ const ServerError = 500;
 const MONGO_DUBLICATE_ERROR_CODE = 11000;
 
 const linkRegex =
-  /^http?:\/\/(www\.)?[0-9a-zA-Z]+([.|-]{1}[0-9a-zA-Z]+)*\.[0-9a-zA-Z-]+(\/[0-9a-zA-Z\-._~:/?#[\]@!$&'()*+,;=]*#?)?$/;
+  /^https?:\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/im;
 
 module.exports = {
   ValidationError,
