@@ -23,9 +23,11 @@ app.use(cookieParser());
 
 app.use(
   "/signin",
-
   celebrate({
     body: Joi.object().keys({
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().regex(linkRegex),
       email: Joi.string().required().email(),
       password: Joi.string().required(),
     }),
@@ -35,7 +37,6 @@ app.use(
 
 app.use(
   "/signup",
-
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
