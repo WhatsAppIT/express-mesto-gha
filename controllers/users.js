@@ -3,19 +3,11 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
-//const key = require("../utils/constants");
-//const { STATUS_CODES } = require("node:http");
-//const { constants as HTTP_STATUS } = require('node:http2');
-//console.log(STATUS_CODES);
-//console.log(HTTP_STATUS);
-
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-//const AuthError = require("../errors/AuthError");
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
 const RepeatError = require("../errors/RepeatError");
-//const ServerError = require("../errors/ServerError");
 
 const postUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
@@ -96,7 +88,7 @@ const login = (req, res, next) => {
 const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
-    res.send(users);
+    return res.send(users);
   } catch (err) {
     next(err);
   }
