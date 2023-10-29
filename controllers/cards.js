@@ -35,35 +35,37 @@ const postCard = (req, res, next) => {
     });
 };
 
-const deleteCardId = async (req, res, next) => {
-  try {
-    const owner = req.user._id;
-    const card = await Card.findByIdAndRemove(req.params.cardId);
-    const cardOwner = await Card.findById(req.params.cardId);
-    if (!card) {
-      throw new Error("NotFound");
-    }
-    if (card.owner.toString() !== owner) {
-      throw new Error("CardOwnerError");
-    }
-    res.send(cardOwner);
-    res.send(card);
-  } catch (err) {
-    if (err.message === "CardOwnerError") {
-      return next(new DeleteCardError("Нельзя удалить данную карточку."));
-    }
-    if (err.message === "NotFound") {
-      return next(new NotFoundError("Карточка по указанному _id не найден."));
-    }
+const deleteCardId = (req, res, next) => {
+  const owner = req.user._id;
 
-    if (err.name === "CastError") {
-      return next(
-        new ValidationError("Переданы некорректные данные при поиске карточки.")
-      );
-    }
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        throw new Error("NotFound");
+      }
+      if (card.owner.toString() !== owner) {
+        throw new Error("CardOwnerError");
+      }
+      return Card.findByIdAndRemove(req.params.cardId);
+    })
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.message === "CardOwnerError") {
+        return next(new DeleteCardError("Нельзя удалить данную карточку."));
+      }
+      if (err.message === "NotFound") {
+        return next(new NotFoundError("Карточка по указанному _id не найден."));
+      }
+      if (err.name === "CastError") {
+        return next(
+          new ValidationError(
+            "Переданы некорректные данные при поиске карточки."
+          )
+        );
+      }
+    });
 
-    return next(err);
-  }
+  return next(err);
 };
 
 const deleteCardsIdLikes = async (req, res, next) => {
