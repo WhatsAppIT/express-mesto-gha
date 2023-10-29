@@ -32,21 +32,15 @@ const postUser = (req, res, next) => {
       })
       .catch((err) => {
         if (err.name === "ValidationError") {
-          return res.status(400).send({
-            message: "Переданы некорректные данные при создании пользователя.",
-          });
-          //next(
-          // new ValidationError(
-          //  "Переданы некорректные данные при создании пользователя."
-          //)
-          //);
+          return next(
+            new ValidationError(
+              "Переданы некорректные данные при создании пользователя."
+            )
+          );
         }
 
         if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-          return res.status(409).send({
-            message: "Переданы некорректные данные при создании пользователя.",
-          });
-          //next(new ConflictError("Такаой email уже зарегистрирован."));
+          return next(new ConflictError("Такаой email уже зарегистрирован."));
         }
 
         return next(err);
@@ -63,7 +57,7 @@ const getProfile = (req, res, next) => {
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.kind === "ObjectId") {
+      if (err.name === "CastError") {
         return next(
           new ValidationError(
             "Переданы некорректные данные при поиске пользователя."
