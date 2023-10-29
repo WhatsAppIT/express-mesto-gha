@@ -105,16 +105,16 @@ const getUserId = async (req, res, next) => {
     const user = await User.findById(req.params.userId);
 
     if (!user) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Пользователь по указанному _id не найден.");
     }
 
     return res.send(user);
   } catch (err) {
-    if (err.message === "NotFound") {
+    /*     if (err.message === "NotFound") {
       return next(
         new NotFoundError("Пользователь по указанному _id не найден.")
       );
-    }
+    } */
 
     if (err.name === "CastError") {
       return next(
