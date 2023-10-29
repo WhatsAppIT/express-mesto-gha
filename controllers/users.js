@@ -92,19 +92,7 @@ const login = (req, res, next) => {
           }
         );
 
-        res.cookie("jwt", token, {
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          httpOnly: true,
-          sameSite: true,
-        });
-
-        res.send({
-          _id: user._id,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-          email: user.email,
-        });
+        res.send({ token });
       });
     })
 
