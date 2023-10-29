@@ -2,12 +2,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
+const key = require("../utils/constants");
 //const { STATUS_CODES } = require("node:http");
 //const { constants as HTTP_STATUS } = require('node:http2');
 //console.log(STATUS_CODES);
 //console.log(HTTP_STATUS);
 
-const { key } = process.env;
+//const { key } = process.env;
 
 //const AuthError = require("../errors/AuthError");
 const ValidationError = require("../errors/ValidationError");
@@ -75,32 +76,13 @@ const getProfile = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
-    .select("+password")
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new SigninError("Неправильная почта или пароль.");
-      }
-
-      return bcrypt
-        .compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            throw new SigninError("Неправильная почта или пароль.");
-          }
-
-          const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
-          res
-            .cookie("jwt", token, {
-              maxAge: 7 * 24 * 60 * 60 * 1000,
-              httpOnly: true,
-              sameSite: true,
-            })
-            .end();
-        })
-        .catch((err) => {
-          next(err);
-        });
+      const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
+      res.send({ token });
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
