@@ -12,7 +12,7 @@ const RepeatError = require("../errors/RepeatError");
 const postUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
 
-  bcrypt.hash(req.body.password, 10).then((hash) => {
+  bcrypt.hash(password, 10).then((hash) => {
     User.create({
       name,
       about,
@@ -25,20 +25,22 @@ const postUser = (req, res, next) => {
           throw new NotFoundError("Нет пользователя с таким id");
         }
 
-        return res.send(user);
+        return res.send({ data: user });
       })
       .catch((err) => {
-        if (err.code === 11000) {
-          next(new RepeatError("Такаой email уже зарегистрирован."));
-        } else if (err.name === "ValidationError") {
-          return next(
+        if (err.name === "ValidationError") {
+          next(
             new ValidationError(
               "Переданы некорректные данные при создании пользователя."
             )
           );
-        } else {
-          next(err);
         }
+
+        if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
+          next(new RepeatError("Такаой email уже зарегистрирован."));
+        }
+
+        return next(err);
       });
   });
 };
