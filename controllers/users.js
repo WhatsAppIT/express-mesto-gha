@@ -90,7 +90,13 @@ const login = (req, res, next) => {
           }
 
           const token = jwt.sign({ _id: user._id }, key, { expiresIn: "7d" });
-          res.send({ token });
+          res
+            .cookie("jwt", token, {
+              maxAge: 7 * 24 * 60 * 60 * 1000,
+              httpOnly: true,
+              sameSite: true,
+            })
+            .end();
         })
         .catch((err) => {
           next(err);
