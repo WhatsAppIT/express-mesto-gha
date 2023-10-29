@@ -8,11 +8,9 @@ const cookieParser = require("cookie-parser");
 const { celebrate, Joi, errors } = require("celebrate");
 const { login, postUser } = require("./controllers/users");
 const auth = require("./middlewares/auth");
-//const ServerError = require("./middlewares/ServerError");
 const routerUsers = require("./routes/users");
 const routerCards = require("./routes/cards");
-
-//const { ServerError } = require("./utils/constants");
+const ServerError = require("../errors/ServerError");
 const { linkRegex } = require("./utils/constants");
 
 const { PORT = 3000, MONGO_URL = "mongodb://127.0.0.1:27017/mestodb" } =
@@ -62,8 +60,7 @@ app.use("*", (req, res, next) => {
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  res.status(500).send("Ошибка на сервере");
-  next();
+  next(new ServerError("Ошибка сервера"));
 });
 
 async function init() {
