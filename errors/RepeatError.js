@@ -1,7 +1,7 @@
 class RepeatError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = 405;
+    this.statusCode = 409;
   }
 }
 
