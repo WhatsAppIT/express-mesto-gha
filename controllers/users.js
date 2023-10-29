@@ -25,7 +25,10 @@ const postUser = (req, res, next) => {
           throw new NotFoundError("Нет пользователя с таким id");
         }
 
-        return res.send({ data: user });
+        return res.status(201).send({
+          _id: user._id,
+          email: user.email,
+        });
       })
       .catch((err) => {
         if (err.name === "ValidationError") {
