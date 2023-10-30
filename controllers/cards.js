@@ -102,12 +102,12 @@ const putCardsIdLikes = async (req, res, next) => {
     return res.send(putLike);
   } catch (error) {
     if (error.kind === "ObjectId") {
-      return res.status(ValidationError).send({
+      return res.status(400).send({
         message: "Переданы некорректные данные для снятия лайка.",
       });
     }
     if (error.message === "NotFound") {
-      return res.status(NotFound).send({
+      return res.status(404).send({
         message: "Карточка с указанным _id не найдена.",
       });
     }
