@@ -58,7 +58,7 @@ const deleteCardId = (req, res, next) => {
     });
 };
 
-const deleteCardsIdLikes = async (req, res) => {
+const deleteCardsIdLikes = async (req, res, next) => {
   try {
     const deleteLike = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -81,9 +81,7 @@ const deleteCardsIdLikes = async (req, res) => {
       );
     }
 
-    return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(error);
   }
 };
 
