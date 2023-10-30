@@ -22,32 +22,20 @@ const postUser = (req, res, next) => {
       password: hash,
     })
       .then((user) => {
-        if (!user) {
-          throw new NotFoundError("Нет пользователя с таким id");
-        }
-
-        return res.send({
-          _id: user._id,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-          email: user.email,
-        });
+        res.send(user);
       })
       .catch((err) => {
-        if (err.name === "ValidationError") {
-          return next(
+        if (err.code === 11000) {
+          next(new RepetError("Такаой email уже зарегистрирован."));
+        } else if (err.name === "ValidationError") {
+          next(
             new ValidationError(
               "Переданы некорректные данные при создании пользователя."
             )
           );
+        } else {
+          next(err);
         }
-
-        if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-          return next(new RepetError("Такаой email уже зарегистрирован."));
-        }
-
-        return next(err);
       });
   });
 };
