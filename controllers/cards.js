@@ -2,11 +2,6 @@ const Card = require("../models/card");
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
 const DeleteCardError = require("../errors/DeleteCardError");
-/* const {
-  ValidationError,
-  NotFound,
-  ServerError,
-} = require("../utils/constants"); */
 
 const getCards = async (req, res, next) => {
   try {
@@ -47,7 +42,7 @@ const deleteCardId = (req, res, next) => {
         throw new DeleteCardError("Нельзя удалить данную карточку.");
       }
       return Card.findByIdAndRemove(req.params.cardId)
-        .then((card) => res.send({ data: card }))
+        .then((card) => res.send(card))
         .catch((err) => {
           next(err);
         });
