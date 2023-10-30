@@ -58,33 +58,27 @@ const deleteCardId = (req, res, next) => {
     });
 };
 
-const deleteCardsIdLikes = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    {
-      $pull: { likes: req.user._id },
-    },
-    { new: true, runValidators: true }
-  )
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError("Передан несуществующий id карточки");
-      }
-      return res.send(card);
-    })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(
-          new ValidationError(
-            "Переданы некорректные данные для постановки/снятии лайка."
-          )
-        );
-      } else if (err.kind === "ObjectId") {
-        next(new ValidationError("Некорректный формат id."));
-      } else {
-        next(err);
-      }
-    });
+const deleteCardsIdLikes = async (req, res, next) => {
+  try {
+    const deleteLike = await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    );
+
+    if (!deleteLike) {
+      throw new NotFoundError("Карточка с указанным _id не найдена.");
+    }
+
+    return res.send(deleteLike);
+  } catch (err) {
+    if (err.name === "CastError") {
+      return next(
+        new ValidationError("Переданы некорректные данные для снятия лайка.")
+      );
+    }
+    return next(err);
+  }
 };
 
 const putCardsIdLikes = async (req, res, next) => {
