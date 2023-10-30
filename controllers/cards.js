@@ -81,7 +81,7 @@ const deleteCardsIdLikes = async (req, res, next) => {
       );
     }
 
-    return next(err);
+    return next(error);
   }
 };
 
