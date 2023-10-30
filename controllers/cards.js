@@ -67,21 +67,18 @@ const deleteCardsIdLikes = async (req, res, next) => {
     );
 
     if (!deleteLike) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Карточка с указанным _id не найдена.");
     }
 
     return res.send(deleteLike);
   } catch (err) {
-    if (err.message === "NotFound") {
-      return res.status(404).send({
-        message: "Карточка с указанным _id не найдена.",
-      });
-    }
-
     if (err.name === "CastError") {
-      return next(
+      next(
         new ValidationError("Переданы некорректные данные для снятия лайка.")
       );
+    }
+    if (err.kind === "ObjectId") {
+      next(new NotFoundError("Несуществующий id."));
     }
     return next(err);
   }
