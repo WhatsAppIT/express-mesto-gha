@@ -58,7 +58,7 @@ const deleteCardId = (req, res, next) => {
     });
 };
 
-const deleteCardsIdLikes = async (req, res) => {
+const deleteCardsIdLikes = async (req, res, next) => {
   try {
     const deleteLike = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -67,25 +67,18 @@ const deleteCardsIdLikes = async (req, res) => {
     );
 
     if (!deleteLike) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Карточка с указанным _id не найдена.");
     }
 
     return res.send(deleteLike);
-  } catch (error) {
-    if (error.message === "NotFound") {
-      return res.status(404).send({
-        message: "Карточка с указанным _id не найдена.",
-      });
-    }
-    if (error.kind === "ObjectId") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные для снятия лайка.",
-      });
+  } catch (err) {
+    if (err.name === "CastError") {
+      return next(
+        new ValidationError("Переданы некорректные данные для снятия лайка.")
+      );
     }
 
-    return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(err);
   }
 };
 
