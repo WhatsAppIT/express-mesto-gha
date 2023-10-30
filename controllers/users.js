@@ -46,7 +46,7 @@ const postUser = (req, res, next) => {
         if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
           return res
             .status(409)
-            .send({ message: "Такаой email уже зарегистрирован." });
+            .json({ message: "Такаой email уже зарегистрирован." });
         }
 
         return next(err);
