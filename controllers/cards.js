@@ -58,7 +58,7 @@ const deleteCardId = (req, res, next) => {
     });
 };
 
-const deleteCardsIdLikes = async (req, res, next) => {
+const deleteCardsIdLikes = async (req, res) => {
   try {
     const deleteLike = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -73,19 +73,23 @@ const deleteCardsIdLikes = async (req, res, next) => {
     return res.send(deleteLike);
   } catch (error) {
     if (error.message === "NotFound") {
-      return new NotFoundError("Карточка с указанным _id не найдена.");
+      return res.status(404).send({
+        message: "Карточка с указанным _id не найдена.",
+      });
     }
     if (error.kind === "ObjectId") {
-      return new ValidationError(
-        "Переданы некорректные данные для снятия лайка."
-      );
+      return res.status(400).send({
+        message: "Переданы некорректные данные для снятия лайка.",
+      });
     }
 
-    return next(error);
+    return res
+      .status(500)
+      .send({ message: "Ошибка на стороне сервера", error });
   }
 };
 
-const putCardsIdLikes = async (req, res) => {
+const putCardsIdLikes = async (req, res, next) => {
   try {
     const putLike = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -94,25 +98,18 @@ const putCardsIdLikes = async (req, res) => {
     );
 
     if (!putLike) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Карточка с указанным _id не найден.");
     }
 
     return res.send(putLike);
-  } catch (error) {
-    if (error.kind === "ObjectId") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные для снятия лайка.",
-      });
-    }
-    if (error.message === "NotFound") {
-      return res.status(404).send({
-        message: "Карточка с указанным _id не найдена.",
-      });
+  } catch (err) {
+    if (err.name === "CastError") {
+      return next(
+        new ValidationError("Переданы некорректные данные для снятия лайка.")
+      );
     }
 
-    return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(err);
   }
 };
 
