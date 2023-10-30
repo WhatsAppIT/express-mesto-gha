@@ -42,7 +42,9 @@ const deleteCardId = (req, res, next) => {
         throw new DeleteCardError("Нельзя удалить данную карточку.");
       }
       return Card.findByIdAndRemove(req.params.cardId)
-        .then((myCard) => res.send(myCard))
+        .then((myCard) => {
+          res.send({ data: myCard });
+        })
         .catch((err) => {
           next(err);
         });
