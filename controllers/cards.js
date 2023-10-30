@@ -41,21 +41,18 @@ const deleteCardId = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new Error("NotFound");
+        throw new NotFoundError("Карточка по указанному _id не найдена.");
       }
       if (card.owner.toString() !== owner) {
-        throw new Error("CardOwnerError");
+        throw new DeleteCardError("Нельзя удалить данную карточку.");
       }
-      return Card.findByIdAndRemove(req.params.cardId);
+      return Card.findByIdAndRemove(req.params.cardId)
+        .then((card) => res.send({ data: card }))
+        .catch((err) => {
+          next(err);
+        });
     })
-    .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.message === "CardOwnerError") {
-        return next(new DeleteCardError("Нельзя удалить данную карточку."));
-      }
-      if (err.message === "NotFound") {
-        return next(new NotFoundError("Карточка по указанному _id не найден."));
-      }
       if (err.name === "CastError") {
         return next(
           new ValidationError(
