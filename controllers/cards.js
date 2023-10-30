@@ -96,15 +96,20 @@ const putCardsIdLikes = async (req, res, next) => {
     );
 
     if (!putLike) {
-      throw new NotFoundError("Карточка с указанным _id не найден.");
+      throw new Error("NotFound");
     }
 
     return res.send(putLike);
-  } catch (err) {
-    if (err.name === "CastError") {
-      return next(
-        new ValidationError("Переданы некорректные данные для снятия лайка.")
-      );
+  } catch (error) {
+    if (error.kind === "ObjectId") {
+      return res.status(ValidationError).send({
+        message: "Переданы некорректные данные для снятия лайка.",
+      });
+    }
+    if (error.message === "NotFound") {
+      return res.status(NotFound).send({
+        message: "Карточка с указанным _id не найдена.",
+      });
     }
 
     return next(err);
