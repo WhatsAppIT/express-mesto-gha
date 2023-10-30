@@ -74,14 +74,11 @@ const deleteCardsIdLikes = async (req, res, next) => {
     );
 
     if (!deleteLike) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Карточка с указанным _id не найдена.");
     }
 
     return res.send(deleteLike);
   } catch (err) {
-    if (err.message === "NotFound") {
-      return next(new NotFoundError("Карточка с указанным _id не найден."));
-    }
     if (err.kind === "ObjectId") {
       return next(
         new ValidationError("Переданы некорректные данные для снятия лайка.")
@@ -101,7 +98,7 @@ const putCardsIdLikes = async (req, res, next) => {
     );
 
     if (!putLike) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Карточка с указанным _id не найден.");
     }
 
     return res.send(putLike);
@@ -110,9 +107,6 @@ const putCardsIdLikes = async (req, res, next) => {
       return next(
         new ValidationError("Переданы некорректные данные для снятия лайка.")
       );
-    }
-    if (err.message === "NotFound") {
-      return next(new NotFoundError("Карточка с указанным _id не найден."));
     }
 
     return next(err);
