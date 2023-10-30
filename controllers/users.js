@@ -146,7 +146,7 @@ const patchUsersMe = async (req, res, next) => {
       throw new NotFoundError("Пользователь по указанному _id не найден.");
     }
 
-    return res.status(200).json(patchUser);
+    return res.send(patchUser);
   } catch (err) {
     if (err.name === "ValidationError") {
       return next(
