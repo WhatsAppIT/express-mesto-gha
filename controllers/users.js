@@ -3,7 +3,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { JWT_SECRET } = process.env;
 
 const ValidationError = require("../errors/ValidationError");
 const NotFoundError = require("../errors/ValidationError");
@@ -44,7 +44,9 @@ const postUser = (req, res, next) => {
         }
 
         if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-          return next(new ConflictError("Такаой email уже зарегистрирован."));
+          return res
+            .status(409)
+            .send({ message: "Такаой email уже зарегистрирован." });
         }
 
         return next(err);
