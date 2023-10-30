@@ -66,7 +66,7 @@ const getProfile = (req, res, next) => {
         );
       }
 
-      next(err);
+      return next(err);
     });
 };
 
@@ -126,7 +126,7 @@ const getUserId = async (req, res, next) => {
       );
     }
 
-    next(err);
+    return next(err);
   }
 };
 

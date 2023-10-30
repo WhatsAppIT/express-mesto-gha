@@ -1,10 +1,10 @@
 // middlewares/auth.js
 
 const jwt = require("jsonwebtoken");
-const SigninError = require("../errors/SigninError");
+//const SigninError = require("../errors/SigninError");
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports = (req, res, next) => {
+module.exports.auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
