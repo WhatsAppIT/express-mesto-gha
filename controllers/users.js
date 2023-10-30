@@ -110,7 +110,7 @@ const getUserId = async (req, res, next) => {
       throw new NotFoundError("Пользователь по указанному _id не найден.");
     }
 
-    return res.send(user);
+    return res.status(200).send(user);
   } catch (err) {
     if (err.name === "CastError") {
       return next(
