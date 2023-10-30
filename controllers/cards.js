@@ -81,9 +81,7 @@ const deleteCardsIdLikes = async (req, res, next) => {
       );
     }
 
-    return res
-      .status(500)
-      .send({ message: "Ошибка на стороне сервера", error });
+    return next(err);
   }
 };
 
