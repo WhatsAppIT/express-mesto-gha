@@ -41,13 +41,10 @@ const deleteCardId = (req, res, next) => {
       if (card.owner.toString() !== owner) {
         throw new DeleteCardError("Нельзя удалить данную карточку.");
       }
-      return Card.findByIdAndRemove(req.params.cardId)
-        .then((myCard) => {
-          res.send({ data: myCard });
-        })
-        .catch((err) => {
-          next(err);
-        });
+      return Card.findByIdAndRemove(req.params.cardId);
+    })
+    .then((myCard) => {
+      res.send({ data: myCard });
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -57,9 +54,8 @@ const deleteCardId = (req, res, next) => {
           )
         );
       }
+      return next(err);
     });
-
-  return next(err);
 };
 
 const deleteCardsIdLikes = async (req, res, next) => {
