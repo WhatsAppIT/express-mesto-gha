@@ -58,7 +58,7 @@ const deleteCardId = (req, res, next) => {
     });
 };
 
-const deleteCardsIdLikes = async (req, res, next) => {
+const deleteCardsIdLikes = async (req, res) => {
   try {
     const deleteLike = await Card.findByIdAndUpdate(
       req.params.cardId,
