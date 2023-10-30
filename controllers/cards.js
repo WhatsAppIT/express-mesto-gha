@@ -71,17 +71,19 @@ const deleteCardsIdLikes = async (req, res, next) => {
     }
 
     return res.send(deleteLike);
-  } catch (error) {
-    if (error.message === "NotFound") {
-      return new NotFoundError("Карточка с указанным _id не найдена.");
+  } catch (err) {
+    if (err.message === "NotFound") {
+      return res.status(404).send({
+        message: "Карточка с указанным _id не найдена.",
+      });
     }
-    if (error.kind === "ObjectId") {
-      return new ValidationError(
-        "Переданы некорректные данные для снятия лайка."
-      );
+    if (err.kind === "ObjectId") {
+      return res.status(400).send({
+        message: "Переданы некорректные данные для снятия лайка.",
+      });
     }
 
-    return next(error);
+    return next(err);
   }
 };
 
@@ -98,13 +100,13 @@ const putCardsIdLikes = async (req, res, next) => {
     }
 
     return res.send(putLike);
-  } catch (error) {
-    if (error.kind === "ObjectId") {
+  } catch (err) {
+    if (err.kind === "ObjectId") {
       return res.status(400).send({
         message: "Переданы некорректные данные для снятия лайка.",
       });
     }
-    if (error.message === "NotFound") {
+    if (err.message === "NotFound") {
       return res.status(404).send({
         message: "Карточка с указанным _id не найдена.",
       });
