@@ -28,6 +28,9 @@ const postUser = (req, res, next) => {
 
         return res.send({
           _id: user._id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
           email: user.email,
         });
       })
