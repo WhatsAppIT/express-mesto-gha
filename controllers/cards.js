@@ -44,7 +44,7 @@ const deleteCardId = (req, res, next) => {
       return Card.findByIdAndRemove(req.params.cardId);
     })
     .then((myCard) => {
-      res.send({ data: myCard });
+      res.send(myCard);
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -77,7 +77,9 @@ const deleteCardsIdLikes = async (req, res, next) => {
         new ValidationError("Переданы некорректные данные для снятия лайка.")
       );
     }
-
+    if (err.kind === "ObjectId") {
+      return next(new ValidationError("Некорректный формат id."));
+    }
     return next(err);
   }
 };
