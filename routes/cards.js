@@ -31,11 +31,11 @@ router.delete(
 );
 router.put(
   "/:cardId/likes",
-  /*   celebrate({
+  celebrate({
     params: Joi.object().keys({
       cardId: Joi.string().hex().length(30),
     }),
-  }), */
+  }),
   putCardsIdLikes
 );
 router.delete(

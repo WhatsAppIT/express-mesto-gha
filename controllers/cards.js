@@ -77,9 +77,7 @@ const deleteCardsIdLikes = async (req, res, next) => {
         new ValidationError("Переданы некорректные данные для снятия лайка.")
       );
     }
-    if (err.kind === "ObjectId") {
-      return next(new NotFoundError("Несуществующий id."));
-    }
+
     return next(err);
   }
 };
