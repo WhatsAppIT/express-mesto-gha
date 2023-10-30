@@ -1,8 +1,8 @@
-class ConflictError extends Error {
+class RepetError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 409;
   }
 }
 
-module.exports = ConflictError;
+module.exports = RepetError;
