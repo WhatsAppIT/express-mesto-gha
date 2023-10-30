@@ -96,7 +96,7 @@ const login = (req, res, next) => {
       });
     })
 
-    .catch((err) => next(new SigninError(err.message)));
+    .catch(next);
 };
 
 const getUsers = async (req, res, next) => {
@@ -113,17 +113,11 @@ const getUserId = async (req, res, next) => {
     const user = await User.findById(req.params.userId);
 
     if (!user) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Пользователь по указанному _id не найден.");
     }
 
     return res.send(user);
   } catch (err) {
-    if (err.message === "NotFound") {
-      return next(
-        new NotFoundError("Пользователь по указанному _id не найден.")
-      );
-    }
-
     if (err.name === "CastError") {
       return next(
         new ValidationError(
@@ -149,16 +143,11 @@ const patchUsersMe = async (req, res, next) => {
     );
 
     if (!patchUser) {
-      throw new Error("NotFoundUser");
+      throw new NotFoundError("Пользователь по указанному _id не найден.");
     }
 
     return res.send(patchUser);
   } catch (err) {
-    if (err.message === "NotFoundUser") {
-      return next(
-        new NotFoundError("Пользователь по указанному _id не найден.")
-      );
-    }
     if (err.name === "ValidationError") {
       return next(
         new ValidationError(
@@ -167,7 +156,7 @@ const patchUsersMe = async (req, res, next) => {
       );
     }
 
-    next(err);
+    return next(err);
   }
 };
 
@@ -181,7 +170,7 @@ const patchUsersMeAvatar = async (req, res, next) => {
     );
 
     if (!patchAvatar) {
-      throw new Error("NotFoundError");
+      throw new NotFoundError("Аватар по указанному _id не найден.");
     }
 
     return res.send(patchAvatar);
@@ -193,11 +182,8 @@ const patchUsersMeAvatar = async (req, res, next) => {
         )
       );
     }
-    if (err.message === "NotFoundError") {
-      return next(new NotFoundError("Аватар по указанному _id не найден."));
-    }
 
-    next(err);
+    return next(err);
   }
 };
 
