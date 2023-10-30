@@ -45,11 +45,11 @@ app.use(
   }),
   postUser
 );
-app.use(auth);
+//app.use(auth);
 
-app.use("/users", routerUsers);
-app.use("/cards", routerCards);
-app.use("*", (req, res, next) => {
+app.use("/users", auth, routerUsers);
+app.use("/cards", auth, routerCards);
+app.use("*", auth, (req, res, next) => {
   next(new NotFoundError("Страница не найдена"));
 });
 
