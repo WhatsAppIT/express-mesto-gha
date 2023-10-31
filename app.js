@@ -49,7 +49,7 @@ app.use(
 app.use("/users", auth, routerUsers);
 app.use("/cards", auth, routerCards);
 app.use("*", auth, (req, res) => {
-  return next(new NotFoundError("Страница не найдена"));
+  return res.status(404).send({ message: err.message });
 });
 
 app.use(errors());
