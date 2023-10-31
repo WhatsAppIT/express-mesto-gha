@@ -36,8 +36,9 @@ const deleteCardId = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Карточка по указанному _id не найдена.");
+        throw new Error("NotFound");
       }
+
       if (card.owner.toString() !== owner) {
         throw new DeleteCardError("Нельзя удалить данную карточку.");
       }
@@ -47,6 +48,11 @@ const deleteCardId = (req, res, next) => {
       res.send(myCard);
     })
     .catch((err) => {
+      if (err.message === "NotFound") {
+        return res
+          .status(404)
+          .send({ message: "Карточка по указанному _id не найдена." });
+      }
       if (err.name === "CastError") {
         return next(
           new ValidationError(
