@@ -49,14 +49,14 @@ app.use(
 app.use("/users", auth, routerUsers);
 app.use("/cards", auth, routerCards);
 app.use("*", auth, (req, res) => {
-  return res.status(404).send({ messge: "Страница не найдена" });
+  return next(new NotFoundError("Страница не найдена"));
 });
 
 app.use(errors());
 
 app.use((err, req, res, next) => {
   if (!err.statusCode) {
-    res.status(500).send({ message: err.message });
+    next(new ServerError("Ошибка сервера"));
   }
   res.status(err.statusCode).send({ message: err.message });
   next();
