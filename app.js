@@ -56,7 +56,7 @@ app.use(errors());
 
 app.use((err, req, res, next) => {
   if (!err.statusCode) {
-    return next(new ServerError("Ошибка сервера"));
+    throw new ServerError("Ошибка сервера");
   }
   res.status(err.statusCode).send({ message: err.message });
   next();
