@@ -24,7 +24,7 @@ const postUser = (req, res, next) => {
       password: hash,
     })
       .then((user) => {
-        res.send({
+        res.status(201).send({
           _id: user._id,
           name: user.name,
           about: user.about,

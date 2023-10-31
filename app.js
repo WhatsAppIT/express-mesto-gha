@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const { login, postUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 const NotFoundError = require('./errors/NotFoundError');
@@ -44,21 +45,16 @@ app.use(
   }),
   postUser,
 );
-app.use('/users', auth, routerUsers);
+app.use(auth);
+app.use('/users', routerUsers);
 
-app.use('/cards', auth, routerCards);
+app.use('/cards', routerCards);
 
-app.use('*', auth, (req, res, next) => next(new NotFoundError('Страница не найдена')));
+app.use('*', (req, res, next) => next(new NotFoundError('Страница не найдена')));
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  if (!err.statusCode) {
-    res.status(500).send({ message: err.message });
-  }
-  res.status(err.statusCode).send({ message: err.message });
-  next();
-});
+app.use(errorHandler);
 
 async function init() {
   await mongoose.connect(MONGO_URL);

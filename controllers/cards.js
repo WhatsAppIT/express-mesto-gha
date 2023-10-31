@@ -17,7 +17,7 @@ const postCard = (req, res, next) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(
@@ -41,7 +41,7 @@ const deleteCardId = (req, res, next) => {
       if (card.owner.toString() !== owner) {
         throw new DeleteCardError('Нельзя удалить данную карточку.');
       }
-      return Card.findByIdAndRemove(req.params.cardId);
+      return Card.deleteOne(card);
     })
     .then((myCard) => {
       res.send(myCard);
