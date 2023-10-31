@@ -9,7 +9,6 @@ const auth = require("./middlewares/auth");
 const routerUsers = require("./routes/users");
 const routerCards = require("./routes/cards");
 const NotFoundError = require("./errors/NotFoundError");
-//const ServerError = require("./errors/ServerError");
 const { linkRegex } = require("./utils/constants");
 
 const { PORT = 3000, MONGO_URL = "mongodb://127.0.0.1:27017/mestodb" } =

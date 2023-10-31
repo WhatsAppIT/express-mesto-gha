@@ -104,13 +104,13 @@ const getUsers = async (req, res, next) => {
 
 const getUserId = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const getUser = await User.findById(req.params.userId);
 
-    if (!user) {
-      throw new NotFoundError("Пользователь по указанному _id не найден.");
+    if (!getUser) {
+      throw new NotFoundError("Нет пользователя с таким id");
     }
 
-    return res.status(200).send(user);
+    return res.send(getUser);
   } catch (err) {
     if (err.name === "CastError") {
       return next(
