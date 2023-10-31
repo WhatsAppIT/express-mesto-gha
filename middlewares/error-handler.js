@@ -3,7 +3,6 @@ const errorHandler = (err, req, res, next) => {
     return res.status(500).send({ message: err.message });
   }
   res.status(err.statusCode).send({ message: err.message });
-  next();
+  return next();
 };
-
 module.exports = errorHandler;
