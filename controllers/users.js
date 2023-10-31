@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
+//const MONGO_DUBLICATE_ERROR_CODE = require("../utils/constants");
 const { JWT_SECRET } = process.env;
 
 const ValidationError = require("../errors/ValidationError");
@@ -39,7 +39,7 @@ const postUser = (req, res, next) => {
           );
         }
 
-        if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
+        if (err.code === 11000) {
           return next(new RepetError("Такаой email уже зарегистрирован."));
         }
 
