@@ -46,8 +46,8 @@ app.use(
   postUser
 );
 
-app.use("/users", auth, routerUsers);
-app.use("/cards", auth, routerCards);
+app.use("/users", routerUsers);
+app.use("/cards", routerCards);
 app.use("*", auth, (req, res) => {
   return next(new NotFoundError("Страница не найдена"));
 });
