@@ -1,6 +1,6 @@
 const Card = require("../models/card");
 const ValidationError = require("../errors/ValidationError");
-const NotFoundError = require("../errors/ValidationError");
+const NotFoundError = require("../errors/NotFoundError");
 const DeleteCardError = require("../errors/DeleteCardError");
 
 const getCards = async (req, res, next) => {
@@ -36,9 +36,8 @@ const deleteCardId = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new Error("NotFound");
+        throw new NotFoundError("Карточка по указанному _id не найдена.");
       }
-
       if (card.owner.toString() !== owner) {
         throw new DeleteCardError("Нельзя удалить данную карточку.");
       }
@@ -48,11 +47,6 @@ const deleteCardId = (req, res, next) => {
       res.send(myCard);
     })
     .catch((err) => {
-      if (err.message === "NotFound") {
-        return res
-          .status(404)
-          .send({ message: "Карточка по указанному _id не найдена." });
-      }
       if (err.name === "CastError") {
         return next(
           new ValidationError(
@@ -78,10 +72,10 @@ const deleteCardsIdLikes = async (req, res, next) => {
 
     return res.send(deleteLike);
   } catch (err) {
-    if (err.kind === "ObjectId") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные для снятия лайка.",
-      });
+    if (err.name === "CastError") {
+      return next(
+        new ValidationError("Переданы некорректные данные для снятия лайка.")
+      );
     }
 
     return next(err);
@@ -97,20 +91,15 @@ const putCardsIdLikes = async (req, res, next) => {
     );
 
     if (!putLike) {
-      throw new Error("NotFound");
+      throw new NotFoundError("Карточка с указанным _id не найден.");
     }
 
     return res.send(putLike);
   } catch (err) {
-    if (err.kind === "ObjectId") {
-      return res.status(400).send({
-        message: "Переданы некорректные данные для снятия лайка.",
-      });
-    }
-    if (err.message === "NotFound") {
-      return res.status(404).send({
-        message: "Карточка с указанным _id не найдена.",
-      });
+    if (err.name === "CastError") {
+      return next(
+        new ValidationError("Переданы некорректные данные для снятия лайка.")
+      );
     }
 
     return next(err);
