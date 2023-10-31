@@ -48,8 +48,8 @@ app.use(
 
 app.use("/users", auth, routerUsers);
 app.use("/cards", auth, routerCards);
-app.use("*", auth, (req, res) => {
-  return res.status(404).send({ message: err.message });
+app.use("*", auth, (req, res, next) => {
+  return next(new ServerError("Страница не найдена"));
 });
 
 app.use(errors());
