@@ -55,10 +55,10 @@ app.use("*", auth, (req, res) => {
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message = "Ошибка сервера" } = err;
-
-  res.status(statusCode).send({ message });
-
+  if (!err.statusCode) {
+    res.status(500).send({ message: err.message });
+  }
+  res.status(err.statusCode).send({ message: err.message });
   next();
 });
 
