@@ -9,7 +9,7 @@ const auth = require("./middlewares/auth");
 const routerUsers = require("./routes/users");
 const routerCards = require("./routes/cards");
 const NotFoundError = require("./errors/NotFoundError");
-//const ServerError = require("./errors/ServerError");
+const ServerError = require("./errors/ServerError");
 const { linkRegex } = require("./utils/constants");
 
 const { PORT = 3000, MONGO_URL = "mongodb://127.0.0.1:27017/mestodb" } =
@@ -56,7 +56,7 @@ app.use(errors());
 
 app.use((err, req, res, next) => {
   if (!err.statusCode) {
-    res.status(500).send({ message: err.message });
+    return next(new ServerError("Ошибка сервера"));
   }
   res.status(err.statusCode).send({ message: err.message });
   next();
