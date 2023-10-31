@@ -104,7 +104,8 @@ const getUsers = async (req, res, next) => {
 
 const getUserId = async (req, res, next) => {
   try {
-    const getUser = await User.findById(req.params.userId);
+    const userId = req.params.userId ? req.params.userId : req.user._id;
+    const getUser = await User.findById(userId);
 
     if (!getUser) {
       throw new NotFoundError("Нет пользователя с таким id");
